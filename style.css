@@ -46,9 +46,9 @@
     float: left;
     width: 20%;
     height: 100%;
+    margin-top: 10px;
 }
 #entryList {
-    margin-top: 10px;
     padding: 10px;
     overflow: hidden;
 }
@@ -65,9 +65,9 @@
     float: right;
     width: 15%;
     height: 100%;
+    margin-top: 10px;
 }
 #right-pane div {
-    margin-top: 10px;
     padding: 10px;
 }
 
@@ -79,15 +79,14 @@
     float: left;
     width: 65%;
     height: 100%;
-    padding: 0 10px;
-}
-#content div {
     margin-top: 10px;
+}
+#main-content {
+    margin: 0 10px;
 }
 
 #form {
     text-align: center;
-    margin-top: 10px;
     padding: 10px;
 }
 
