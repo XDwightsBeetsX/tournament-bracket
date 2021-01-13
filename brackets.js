@@ -1,22 +1,29 @@
 /*===========================*/
-/*======== Gloabals =========*/
+/*======== Globals ==========*/
 /*===========================*/
 var Entries = [];
 
 
 /*===========================*/
-/*===== On Window Load ======*/
+/*===== Window Loading ======*/
 /*===========================*/
 window.onload = function() {
+    // Sets up Globals and Event Listeners
     listenForEntry();
     Entries = [];
 }
+
+window.onbeforeunload = function() {
+    // Prevents unintentional refreshing, which loses data
+    return "Data will be lost if you leave the page, are you sure?";
+};
 
 
 /*===========================*/
 /*===== Event Listeners =====*/
 /*===========================*/
 function listenForEntry() {
+    // Allows user to shortcut clicking the button by pressing 'Enter' 
     var input = document.getElementById('entry');
     input.addEventListener('keyup', function(event) {
         if (event.code === 'Enter') {
@@ -32,14 +39,18 @@ function listenForEntry() {
 /*========= Dynamic =========*/
 /*===========================*/
 function newEntry() {
+    // Reads in new entry and resets the input box
     var input = document.getElementById("entry");
-    var newEntry = new Entry(input.value);
-    input.value = '';
-    alert("Added " + newEntry.Name + "!");
-    addEntryToList(newEntry);
+    var val = input.value;
+    if (val != null && val != ''){
+        var newEntry = new Entry(val);
+        addEntryToList(newEntry);
+    }
+    input.value = '';    
 }
 
 function addEntryToList(newEntry) {
+    // Makes a new div on the page with the entry name
     Entries.push(newEntry);
     var newEntryDiv = document.createElement('div');
     newEntryDiv.innerHTML = newEntry.Name;
