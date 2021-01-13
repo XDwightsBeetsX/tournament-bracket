@@ -1,54 +1,106 @@
 /*===========================*/
+/*==== Incl Pad & Bord ======*/
+/*===========================*/
+*{
+    box-sizing: border-box;
+}
+
+
+/*===========================*/
+/*========= Device ==========*/
+/*===========================*/
+@media screen and (min-width: 650px) {
+    body{
+        width: 100%;
+    }
+}
+
+
+/*===========================*/
 /*======== Wrappers =========*/
 /*===========================*/
 #wrapper-main {
-    width: 100%;
     height: 100%;
-    margin: .5%;
+    margin: 1%;
+    overflow: auto;
 }
 
 
 /*===========================*/
 /*======== Headings =========*/
 /*===========================*/
-
 .header {
     width: 100%;
     height: 120px;
     text-align: center;
     vertical-align: middle;
     line-height: 120px;
+    font-size: 24pt;
 }
 
 
 /*===========================*/
 /*======= Left Pane =========*/
 /*===========================*/
-
 #left-pane {
     float: left;
     width: 20%;
     height: 100%;
+}
+#left-pane div {
+    margin-top: 10px;
 }
 
 
 /*===========================*/
 /*======= Right Pane =========*/
 /*===========================*/
-
 #right-pane {
     float: right;
     width: 15%;
     height: 100%;
+}
+#right-pane div {
+    margin-top: 10px;
 }
 
 
 /*===========================*/
 /*========= Content =========*/
 /*===========================*/
-
 #content {
     float: left;
     width: 65%;
     height: 100%;
+    padding: 0 10px;
+}
+#content div {
+    margin-top: 10px;
+}
+
+#form {
+    text-align: center;
+    margin-top: 10px;
+    padding: 10px;
+}
+
+#bracket {
+    padding: 10px;
+}
+
+
+/*===========================*/
+/*========== Text ===========*/
+/*===========================*/
+.verdana-gray {
+    font-family: Verdana;
+    color: #8d8d8d;
+}
+
+
+/*===========================*/
+/*======= Background ========*/
+/*===========================*/
+.light-gray {
+    background-color: #e5e5e5;
 }
