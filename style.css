@@ -89,6 +89,10 @@
     text-align: center;
     padding: 10px;
 }
+#btn-make-bracket {
+    float: right;
+    margin-right: 50px;
+}
 
 #bracket {
     text-align: center;
