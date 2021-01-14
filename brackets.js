@@ -24,11 +24,11 @@ window.onbeforeunload = function() {
 /*===========================*/
 function listenForEntry() {
     // Allows user to shortcut clicking the button by pressing 'Enter' 
-    var input = document.getElementById('entry');
+    let input = document.getElementById('entry');
     input.addEventListener('keyup', function(event) {
         if (event.code === 'Enter') {
             event.preventDefault();
-            var submitButton = document.getElementById('btn-entry-submit');
+            let submitButton = document.getElementById('btn-entry-submit');
             submitButton.click();
         }
     });
@@ -40,10 +40,10 @@ function listenForEntry() {
 /*===========================*/
 function newEntry() {
     // Reads in new entry and resets the input box
-    var input = document.getElementById("entry");
-    var val = input.value;
+    let input = document.getElementById("entry");
+    let val = input.value;
     if (val != null && val != ''){
-        var newEntry = new Entry(val);
+        let newEntry = new Entry(val);
         addEntryToList(newEntry);
     }
     input.value = '';    
@@ -52,9 +52,65 @@ function newEntry() {
 function addEntryToList(newEntry) {
     // Makes a new div on the page with the entry name
     Entries.push(newEntry);
-    var newEntryDiv = document.createElement('div');
+    let newEntryDiv = document.createElement('div');
     newEntryDiv.innerHTML = newEntry.Name;
     document.getElementById("entryList").appendChild(newEntryDiv);
+}
+
+function clear(elementId) {
+    document.getElementById(elementId).innerHTML = "";
+}
+
+function makeBracket() {
+    /* Creates a bracket with (global) Entries
+     * Displays bracket with divs
+     */
+
+    // CASE 1: no entries
+    if (Entries.length == 0) {
+        clear("bracket");
+        let bracket =  document.getElementById('bracket');
+
+        // Bracket wrapper for single entry
+        let singleEntryDiv = document.createElement('div');
+        singleEntryDiv.className = "single-entry";
+        singleEntryDiv.style.textAlign = "center";
+        bracket.appendChild(singleEntryDiv);
+
+        // Add descriptive entry
+        let entryDiv = document.createElement('div');
+        entryDiv.innerHTML = "No Entries Found";
+        entryDiv.className = "bracket-entry";
+        entryDiv.style.display = "inline";
+        singleEntryDiv.appendChild(entryDiv);
+    }
+
+    // CASE 2: one entry
+    else if (Entries.length == 1) {
+        clear("bracket");
+        let bracket =  document.getElementById('bracket');
+
+        // Bracket wrapper for single entry
+        let singleEntryDiv = document.createElement('div');
+        singleEntryDiv.className = "single-entry";
+        singleEntryDiv.style.textAlign = "center";
+        bracket.appendChild(singleEntryDiv);
+
+        // Add descriptive entry
+        let entryDiv = document.createElement('div');
+        entryDiv.innerHTML = "One Entry: " + Entries[0].Name;
+        entryDiv.className = "bracket-entry";
+        entryDiv.style.display = "inline";
+        singleEntryDiv.appendChild(entryDiv);
+    }
+
+    // CASE 3: 2+ entries
+    else {
+        clear("bracket");
+
+        let bracketDiv = document.getElementById('bracket');
+
+    }
 }
 
 
