@@ -111,10 +111,10 @@ function makeBracket() {
         let bracketDepth = Math.round(Math.log2(Entries.length)) + 2;
         let cols = [];
 
-        // sub-bracket cols (using .bracket-entry 30px height)
+        // make bracket columns (using .bracket-entry 30px height)
         for (let i = 0; i < bracketDepth; i++) {
             let col = document.createElement("div");
-            col.className = "bracket-col bg-light-gray";
+            col.className = "bracket-col";
             col.style.width = String(100 / bracketDepth) + "%";
             col.style.height = String(Entries.length * 30) + "px";
             col.id = "bracket-col-" + i;
@@ -122,8 +122,13 @@ function makeBracket() {
             cols.push(col);
         }
         
+        // fill in cols
         let col0 = document.getElementById("bracket-col-0");
         for (let i = 0; i < Entries.length; i++) {
+            // todo how to choose winner? button, click...
+
+            // todo make bracket divisions based on index
+
             let entry = document.createElement("div");
             entry.className = "bracket-entry verdana-gray";
             entry.innerHTML = Entries[i].Name;
