@@ -108,14 +108,15 @@ function makeBracket() {
     else {
         clear("bracket");
         let bracket = document.getElementById("bracket");
-        let bracketDepth = Math.floor(Math.log2(Entries.length)) + 2;
+        let bracketDepth = Math.round(Math.log2(Entries.length)) + 2;
         let cols = [];
 
-        // sub-bracket cols
+        // sub-bracket cols (using .bracket-entry 30px height)
         for (let i = 0; i < bracketDepth; i++) {
             let col = document.createElement("div");
             col.className = "bracket-col bg-light-gray";
             col.style.width = String(100 / bracketDepth) + "%";
+            col.style.height = String(Entries.length * 30) + "px";
             col.id = "bracket-col-" + i;
             bracket.appendChild(col);
             cols.push(col);
