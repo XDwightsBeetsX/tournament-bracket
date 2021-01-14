@@ -88,16 +88,16 @@ function makeBracket() {
     // CASE 2: one entry
     else if (Entries.length == 1) {
         clear("bracket");
-        let bracket =  document.getElementById('bracket');
+        let bracket =  document.getElementById("bracket");
 
         // Bracket wrapper for single entry
-        let singleEntryDiv = document.createElement('div');
+        let singleEntryDiv = document.createElement("div");
         singleEntryDiv.className = "single-entry";
         singleEntryDiv.style.textAlign = "center";
         bracket.appendChild(singleEntryDiv);
 
         // Add descriptive entry
-        let entryDiv = document.createElement('div');
+        let entryDiv = document.createElement("div");
         entryDiv.innerHTML = "One Entry: " + Entries[0].Name;
         entryDiv.className = "bracket-entry";
         entryDiv.style.display = "inline";
@@ -107,9 +107,27 @@ function makeBracket() {
     // CASE 3: 2+ entries
     else {
         clear("bracket");
+        let bracket = document.getElementById("bracket");
+        let bracketDepth = Math.floor(Math.log2(Entries.length)) + 2;
+        let cols = [];
 
-        let bracketDiv = document.getElementById('bracket');
-
+        // sub-bracket cols
+        for (let i = 0; i < bracketDepth; i++) {
+            let col = document.createElement("div");
+            col.className = "bracket-col bg-light-gray";
+            col.style.width = String(100 / bracketDepth) + "%";
+            col.id = "bracket-col-" + i;
+            bracket.appendChild(col);
+            cols.push(col);
+        }
+        
+        let col0 = document.getElementById("bracket-col-0");
+        for (let i = 0; i < Entries.length; i++) {
+            let entry = document.createElement("div");
+            entry.className = "bracket-entry verdana-gray";
+            entry.innerHTML = Entries[i].Name;
+            col0.appendChild(entry);
+        }
     }
 }
 
