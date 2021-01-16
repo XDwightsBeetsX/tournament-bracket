@@ -80,9 +80,9 @@
 #content {
     float: left;
     width: 68%;
+    margin: 10px 1%;
     height: 100%;
     min-height: 100px;
-    margin: 10px 1%;
 }
 
 #main-content {
@@ -103,6 +103,10 @@
 .bracket-col {
     float: left;
 }
+.bracket-col .bracket-matchup-separation {
+    width: 100%;
+}
+
 .bracket-entry {
     height: 30px;
     width: 100px;
