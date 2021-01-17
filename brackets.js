@@ -2,7 +2,6 @@
 /*======== Globals ==========*/
 /*===========================*/
 var Entries = [];
-var lastBracketEntries = [];
 
 
 /*===========================*/
@@ -12,13 +11,11 @@ window.onload = function() {
     // Sets up Globals and Event Listeners
     listenForEntry();
     Entries = [];
-    lastBracketEntries = [];
 }
 
 window.onbeforeunload = function() {
     // Prevents unintentional refreshing, which loses data
     Entries = [];
-    lastBracketEntries = [];
     return "Data will be lost if you leave the page, are you sure?";
 };
 
@@ -97,12 +94,8 @@ function makeBracket() {
      * where some teams may recieve a 'bye' into the next round
      */
 
-    // CASE 0: same bracket requested again
-    if (lastBracketEntries == Entries) {
-        alert("This bracket has already been constructed.");
-    }
     // CASE 1: no entries
-    else if (Entries.length == 0) {
+    if (Entries.length == 0) {
         clear("bracket");
         let bracket =  document.getElementById('bracket');
 
@@ -142,7 +135,6 @@ function makeBracket() {
         clear("bracket");
         let bracket = document.getElementById("bracket");
         let bracketEntryHeight = 30;  // px
-        let bracketMatchupSeparation = 20;  //px
 
         // Find nearest 2^n that can fit the number of entries
         let bracketDepth = Math.ceil(Math.log2(Entries.length)) + 1;
@@ -155,19 +147,19 @@ function makeBracket() {
         for (let colIndex = 0; colIndex < bracketDepth; colIndex++) {
             // Make col
             let col = document.createElement("div");
-            let colHeight = prettyBracketSize * bracketEntryHeight + bracketMatchupSeparation * (prettyBracketSize/2 + (bracketDepth - 2));
+            let colHeight = bracketEntryHeight * (2**bracketDepth - 1);
             let colId = "bracket-col-" + colIndex;
             col.className = "bracket-col";
-            col.style.width = String(100 / bracketDepth) + "%";
-            col.style.height = String(colHeight) + "px";
+            col.style.width = 100 / bracketDepth + "%";
+            col.style.height = colHeight + "px";
             col.id = colId;
             bracket.appendChild(col);
 
             // Add leading spacing before first element in col
             if (colIndex != 0) {
-                let leadingColSpacingCount = 2**(colIndex - 1) / 2;
-                for (i = 0; i < leadingColSpacingCount; i++) {
-                    addBracketSpace(colId, bracketMatchupSeparation / 2);
+                let leadingSpaceCount = 2**colIndex - 1;
+                for (let i = 0; i < leadingSpaceCount; i++) {
+                    addBracketSpace(colId, bracketEntryHeight);
                 }
             }
 
@@ -179,26 +171,21 @@ function makeBracket() {
                 entry.innerHTML = colEntries[i].Name;
                 col.appendChild(entry);
 
-                // Add inter-matchup spacing on all but last last col entry
-                if (i < colEntries.length - 1) {
-                    for (let j = 0; j < Math.log2(prettyBracketSize); j++) {
-                        if ((i+1) % 2**j == 0) {
-                            addBracketSpace(colId, bracketMatchupSeparation);
-                        }
-                    }
+                // Add inter-Entry spacing
+                let interEntrySpaceCount = 2**(colIndex + 1) - 1;
+                for (let i = 0; i < interEntrySpaceCount; i++) {
+                    addBracketSpace(colId, bracketEntryHeight);
                 }
             }
 
-            // Add trailing spacing after last element in col
+            // Add leading spacing before first element in col
             if (colIndex != 0) {
-                let trailingColSpacingCount = 2**(colIndex - 1) / 2;
-                for (i = 0; i < trailingColSpacingCount; i++) {
-                    addBracketSpace(colId, bracketMatchupSeparation / 2);
+                let trailingSpaceCount = 2**colIndex - 1;
+                for (let i = 0; i < trailingSpaceCount; i++) {
+                    addBracketSpace(colId, bracketEntryHeight);
                 }
             }
         }
-        // Save previous bracket submission to save work
-        lastBracketEntries = deepCopy(Entries);
     }
 }
 
@@ -245,6 +232,7 @@ function addBracketSpace(colId, spacePx) {
     let space = document.createElement("div");
     space.className = "bracket-matchup-separator";
     space.style.height = spacePx + "px";
+    space.style.width = 100 + "%";
     col.appendChild(space);
 }
 

@@ -103,9 +103,6 @@
 .bracket-col {
     float: left;
 }
-.bracket-col .bracket-matchup-separation {
-    width: 100%;
-}
 
 .bracket-entry {
     height: 30px;
