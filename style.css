@@ -15,6 +15,10 @@
     }
 } */
 
+.pointer {
+    cursor: pointer;
+}
+
 
 /*===========================*/
 /*======== Wrappers =========*/
@@ -56,6 +60,7 @@
 #entryList div {
     margin-top: 10px;
     padding-left: 20px;
+    height: 20px;
 }
 
 

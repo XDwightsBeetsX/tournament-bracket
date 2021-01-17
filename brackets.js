@@ -55,12 +55,14 @@ function newEntry() {
         delete newEntry;
     }
     else {
-        // Add newEntry to Entries
         Entries.push(newEntry);
         
-        // Then create the element for newEntry
         let newEntryDiv = document.createElement('div');
         newEntryDiv.innerHTML = newEntry.Name;
+        newEntryDiv.id = "entryName-" + newEntry.Name;
+
+        addDeleteButtonToNewEntry(newEntryDiv);
+
         document.getElementById("entryList").appendChild(newEntryDiv);
     }
     // Reset the form to blank string
@@ -82,6 +84,47 @@ function isEntryUnique(newEntry) {
         }
     }
     return true;
+}
+
+function getEntryIndex(EntryName) {
+    /* Returns the index of the Entry in Entries
+     * If not found, returns null
+     */
+    for (let i = 0; i < Entries.length; i++) {
+        if (Entries[i].Name == EntryName) {
+            return i;
+        }
+    }
+    return null;
+}
+
+function addDeleteButtonToNewEntry(newEntryDiv) {
+    /* Creates a child "img" element to hold the delete .png
+     * adds the onclick method removeEntry(this)
+     */
+    let entryDeleteButton = document.createElement("img");
+    entryDeleteButton.src = "img/button-x.png";
+    entryDeleteButton.style.height = 100 + "%";
+    entryDeleteButton.style.width = "auto";
+    entryDeleteButton.style.float = "right";
+    entryDeleteButton.className = "pointer";
+    entryDeleteButton.setAttribute('onclick', "removeEntryFromDivId(this.parentNode.id)");
+    entryDeleteButton.setAttribute("alt", "delete entry");
+    newEntryDiv.appendChild(entryDeleteButton);
+}
+
+function removeEntryFromDivId(EntryDivId) {
+    // remove from html document
+    let parent = document.getElementById(EntryDivId);
+    parent.remove();
+
+    // remove from entries
+    // first "entryName-" prefix to find Entry.Name
+    let entryToRemoveName = EntryDivId.slice(10);
+    let entryToRemoveIndex = getEntryIndex(entryToRemoveName);
+    if (entryToRemoveIndex != null) {
+        Entries.splice(entryToRemoveIndex, 1);
+    }
 }
 
 function clear(elementId) {
