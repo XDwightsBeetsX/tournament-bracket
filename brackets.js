@@ -39,22 +39,22 @@ function listenForEntry() {
 /*========= Dynamic =========*/
 /*===========================*/
 function newEntry() {
-    // Reads in new entry and resets the input box
+    /* Reads in new entry and resets the input box
+     */
     let input = document.getElementById("entry");
     let val = input.value;
     if (val != null && val != ''){
+        // Add newEntry to Entries
         let newEntry = new Entry(val);
-        addEntryToList(newEntry);
+        Entries.push(newEntry);
+        
+        // Then create the element for newEntry
+        let newEntryDiv = document.createElement('div');
+        newEntryDiv.innerHTML = newEntry.Name;
+        document.getElementById("entryList").appendChild(newEntryDiv);
     }
+    // Reset the form to blank string
     input.value = '';    
-}
-
-function addEntryToList(newEntry) {
-    // Makes a new div on the page with the entry name
-    Entries.push(newEntry);
-    let newEntryDiv = document.createElement('div');
-    newEntryDiv.innerHTML = newEntry.Name;
-    document.getElementById("entryList").appendChild(newEntryDiv);
 }
 
 function clear(elementId) {
@@ -68,9 +68,10 @@ function makeBracket() {
      *       some teams are placed directly into second round
      */
 
+    clear("bracket");
+
     // CASE 1: no entries
     if (Entries.length == 0) {
-        clear("bracket");
         let bracket =  document.getElementById('bracket');
 
         // Bracket wrapper for single entry
@@ -89,7 +90,6 @@ function makeBracket() {
 
     // CASE 2: one entry
     else if (Entries.length == 1) {
-        clear("bracket");
         let bracket =  document.getElementById("bracket");
 
         // Bracket wrapper for single entry
@@ -106,78 +106,109 @@ function makeBracket() {
         singleEntryDiv.appendChild(entryDiv);
     }
 
-    // CASE 3: 2+ entries
+    // CASE 3: 2+ entries, typical
     else {
-        clear("bracket");
         let bracket = document.getElementById("bracket");
         let bracketEntryHeight = 30;  // px
         let bracketMatchupSeparation = 20; //px
         let cols = [];
 
-        // bracketDepth including playToEnter round
+        // Find nearest 2^n that can fit the number of entries
         let bracketDepth = Math.ceil(Math.log2(Entries.length)) + 1;
+        let prettyBracketSize = 2**(bracketDepth - 1);
 
+        let filledBracketEntries = getEntriesFilledWithByes(prettyBracketSize, bracketDepth);
+        
         // make bracket columns using bracketEntryHeight
         for (let i = 0; i < bracketDepth; i++) {
             let col = document.createElement("div");
             col.className = "bracket-col";
             col.style.width = String(100 / bracketDepth) + "%";
-            let colHeight = Entries.length * (bracketEntryHeight + .5 * bracketMatchupSeparation);
+            let colHeight = prettyBracketSize * bracketEntryHeight + bracketMatchupSeparation * (prettyBracketSize/2 + (bracketDepth - 2));
             col.style.height = String(colHeight) + "px";
             col.id = "bracket-col-" + i;
             bracket.appendChild(col);
             cols.push(col);
         }
 
-        // Nearest 2^n that can fit the number of entries
-        let prettyBracketSize = 2**Math.ceil(Math.log2(Entries.length));
+        // fill in cols
+        for (let colIndex = 0; colIndex < bracketDepth; colIndex++) {
+            let currentColId = "bracket-col-" + colIndex;
+            let col = document.getElementById(currentColId);
+            let colPrettyEntryCount = 2**(bracketDepth - colIndex);
 
-        // find the number of entries that go straight to the first round
-        let firstRoundCount = prettyBracketSize - Entries.length;
-        
-        // find the number of entries that need to play for their spot in first round
-        let playToEnterCount = Entries.length - firstRoundCount;
-        
-        alert("Depth: " + bracketDepth + ", Entries: " + Entries.length + ", FirstRoundCt: " + firstRoundCount + ", playForEntry: " + playToEnterCount);
-        
-        // Pretty bracket (2, 4, 8...)
-        if (firstRoundCount == 0) {
-            // fill in cols
-            for (let colIndex = 0; colIndex < bracketDepth; colIndex++) {
-                let col = document.getElementById("bracket-col-" + colIndex);
-
+            // spacing before first element in col
+            if (colIndex != 0) {
+                let leadingColSpacingCount = 2**(colIndex - 1) / 2;
+                for (i = 0; i < leadingColSpacingCount; i++) {
+                    addBracketSpace(currentColId, bracketMatchupSeparation / 2);
+                }
             }
-            // let col0 = document.getElementById("bracket-col-0");
-            // for (let i = 0; i < Entries.length; i++) {
-            //     let entry = document.createElement("div");
-            //     entry.className = "bracket-entry verdana-gray";
-            //     entry.innerHTML = Entries[i].Name;
-            //     col0.appendChild(entry);
 
-            //     addBracketSpace("bracket-col-0", bracketMatchupSeparation);
+            // Setup
+            let colDepth = bracketDepth - colIndex;
+            let prettyEntriesInColCount = 2**colDepth;
+            for (i = 0; i < prettyEntriesInColCount; i++) {
+                let entry = document.createElement("div");
+                entry.className = "bracket-entry verdana-gray";
 
-            //     if ((i+1) % 2 == 0) {
-            //         addBracketSpace("bracket-col-0", bracketMatchupSeparation);
-            //     }
-            // }
-        }
-        // ugly bracket, need to slide entries in to next round
-        else {
-            // place play-to-enter teams
+                // Fill first column with entries, winners aren't decided yet
+                if (i == 0) {
+                    entry.innerHTML = filledBracketEntries[i].Name;
+                }
+                else {
+                    entry.innerHTML = "";
+                }
+                col.appendChild(entry);
 
-            // place next teams like regular
+                addBracketSpace("bracket-col-0", bracketMatchupSeparation);
 
+                if ((i+1) % 2 == 0) {
+                    addBracketSpace("bracket-col-0", bracketMatchupSeparation);
+                }
+            }
         }
     }
 }
 
-function addBracketSpace(colId, spacePx)
-{
+function getEntriesFilledWithByes(prettyBracketSize, bracketDepth) {
+    /* Creates a 2D copy to return, dont want to mess with actual Entries
+     */
+    let filledBracketEntries = [Entries];
+    
+    // Fill first col with byes
+    while (EntriesCopy.length < prettyBracketSize) {
+        let randIndex = getRandomInt(EntriesCopy.length);
+        let newByeEntry = new Entry("BYE");
+
+        let swapEntry = filledBracketEntries[0][randIndex];
+        filledBracketEntries[0][randIndex] = newByeEntry;
+        filledBracketEntries[0].push(swapEntry);
+    }
+
+    // Fill remaining cols with Byes
+    let colSize = prettyBracketSize;
+    for (let col = 1; col < Math.log2(prettyBracketSize); col++) {
+        colSize = colSize / 2;
+        for (let i = 0; i < colSize; i++) {
+            let newByeEntry = new Entry("BYE");
+            filledBracketEntries[col].push(newByeEntry);
+        }
+    }
+    
+    return filledBracketEntries;
+}
+
+function addBracketSpace(colId, spacePx) {
     let col = document.getElementById(colId);
     let space = document.createElement("div");
     space.className = "bracket-matchup-separator";
     space.style.height = spacePx + "px";
     col.appendChild(space);
+}
+
+function getRandomInt(max) {
+    return Math.floor(Math.random() * Math.floor(max));
 }
 
 class Entry {
