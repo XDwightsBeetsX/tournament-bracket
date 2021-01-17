@@ -15,6 +15,7 @@ window.onload = function() {
 
 window.onbeforeunload = function() {
     // Prevents unintentional refreshing, which loses data
+    Entries = [];
     return "Data will be lost if you leave the page, are you sure?";
 };
 
@@ -43,9 +44,18 @@ function newEntry() {
      */
     let input = document.getElementById("entry");
     let val = input.value;
-    if (val != null && val != ''){
+    let newEntry = new Entry(val);
+    
+    if (!isValidEntry(newEntry)){
+        alert("Entry: '" + newEntry.Name + "' is invalid.");
+        delete newEntry;
+    }
+    else if (!isEntryUnique(newEntry)) {
+        alert("Entry '" + newEntry.Name + "' has already been added.");
+        delete newEntry;
+    }
+    else {
         // Add newEntry to Entries
-        let newEntry = new Entry(val);
         Entries.push(newEntry);
         
         // Then create the element for newEntry
@@ -55,6 +65,23 @@ function newEntry() {
     }
     // Reset the form to blank string
     input.value = '';    
+}
+
+function isValidEntry(newEntry) {
+    let flag = true;
+    if (newEntry.Name == '' || newEntry.Name == undefined) {
+        flag = false;
+    }
+    return flag;
+}
+
+function isEntryUnique(newEntry) {
+    for (let i = 0; i < Entries.length; i++) {
+        if (Entries[i].Name == newEntry.Name) {
+            return false;
+        }
+    }
+    return true;
 }
 
 function clear(elementId) {
@@ -67,7 +94,6 @@ function makeBracket() {
      * where some teams may need to play to get into the tournament/
      *       some teams are placed directly into second round
      */
-
     clear("bracket");
 
     // CASE 1: no entries
@@ -87,7 +113,6 @@ function makeBracket() {
         entryDiv.style.display = "inline";
         singleEntryDiv.appendChild(entryDiv);
     }
-
     // CASE 2: one entry
     else if (Entries.length == 1) {
         let bracket =  document.getElementById("bracket");
@@ -105,7 +130,6 @@ function makeBracket() {
         entryDiv.style.display = "inline";
         singleEntryDiv.appendChild(entryDiv);
     }
-
     // CASE 3: 2+ entries, typical
     else {
         let bracket = document.getElementById("bracket");
@@ -116,7 +140,7 @@ function makeBracket() {
         let bracketDepth = Math.ceil(Math.log2(Entries.length)) + 1;
         let prettyBracketSize = 2**(bracketDepth - 1);
 
-        // 2D Array filled in with BYEs
+        // 2D Array of Entries filled in with BYEs and TBDs
         let filledBracketEntries = getEntriesFilledWithByes(prettyBracketSize);
         
         // Make columns and add entries to each column
@@ -157,7 +181,7 @@ function makeBracket() {
                 }
             }
 
-            // Add trailing spacing before first element in col
+            // Add trailing spacing after last element in col
             if (colIndex != 0) {
                 let trailingColSpacingCount = 2**(colIndex - 1) / 2;
                 for (i = 0; i < trailingColSpacingCount; i++) {
@@ -171,8 +195,10 @@ function makeBracket() {
 function getEntriesFilledWithByes(prettyBracketSize) {
     /* Creates a 2D copy to return, dont want to mess with actual Entries
      */
-    debugger;
-    let filledBracketEntries = [Entries];
+    let filledBracketEntries = [[]];
+    for (let i = 0; i < Entries.length; i++) {
+        filledBracketEntries[0].push(Entries[i]);
+    }
     let newByeEntryCount = prettyBracketSize - filledBracketEntries[0].length;
     
     // Fill first col with byes
