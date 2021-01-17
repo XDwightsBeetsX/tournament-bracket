@@ -2,6 +2,7 @@
 /*======== Globals ==========*/
 /*===========================*/
 var Entries = [];
+var lastBracketEntries = [];
 
 
 /*===========================*/
@@ -11,11 +12,13 @@ window.onload = function() {
     // Sets up Globals and Event Listeners
     listenForEntry();
     Entries = [];
+    lastBracketEntries = [];
 }
 
 window.onbeforeunload = function() {
     // Prevents unintentional refreshing, which loses data
     Entries = [];
+    lastBracketEntries = [];
     return "Data will be lost if you leave the page, are you sure?";
 };
 
@@ -89,15 +92,18 @@ function clear(elementId) {
 }
 
 function makeBracket() {
-    /* Creates a bracket with (global) Entries
+    /* Creates a bracket with list of Entries
      * Displays bracket in columns,
-     * where some teams may need to play to get into the tournament/
-     *       some teams are placed directly into second round
+     * where some teams may recieve a 'bye' into the next round
      */
-    clear("bracket");
 
+    // CASE 0: same bracket requested again
+    if (lastBracketEntries == Entries) {
+        alert("This bracket has already been constructed.");
+    }
     // CASE 1: no entries
-    if (Entries.length == 0) {
+    else if (Entries.length == 0) {
+        clear("bracket");
         let bracket =  document.getElementById('bracket');
 
         // Bracket wrapper for single entry
@@ -115,6 +121,7 @@ function makeBracket() {
     }
     // CASE 2: one entry
     else if (Entries.length == 1) {
+        clear("bracket");
         let bracket =  document.getElementById("bracket");
 
         // Bracket wrapper for single entry
@@ -132,6 +139,7 @@ function makeBracket() {
     }
     // CASE 3: 2+ entries, typical
     else {
+        clear("bracket");
         let bracket = document.getElementById("bracket");
         let bracketEntryHeight = 30;  // px
         let bracketMatchupSeparation = 20;  //px
@@ -189,16 +197,15 @@ function makeBracket() {
                 }
             }
         }
+        // Save previous bracket submission to save work
+        lastBracketEntries = deepCopy(Entries);
     }
 }
 
 function getEntriesFilledWithByes(prettyBracketSize) {
     /* Creates a 2D copy to return, dont want to mess with actual Entries
      */
-    let filledBracketEntries = [[]];
-    for (let i = 0; i < Entries.length; i++) {
-        filledBracketEntries[0].push(Entries[i]);
-    }
+    let filledBracketEntries = [deepCopy(Entries)];
     let newByeEntryCount = prettyBracketSize - filledBracketEntries[0].length;
     
     // Fill first col with byes
@@ -239,6 +246,15 @@ function addBracketSpace(colId, spacePx) {
     space.className = "bracket-matchup-separator";
     space.style.height = spacePx + "px";
     col.appendChild(space);
+}
+
+function deepCopy(array) {
+    let copyArr = [];
+    for (let i = 0; i < array.length; i++) {
+        copyArr.push(array[i]);
+    }
+
+    return copyArr;
 }
 
 class Entry {
