@@ -172,10 +172,12 @@ function makeBracket() {
                 col.appendChild(entry);
 
                 // Add inter-Entry spacing
-                let interEntrySpaceCount = 2**(colIndex + 1) - 1;
-                for (let i = 0; i < interEntrySpaceCount; i++) {
-                    addBracketSpace(colId, bracketEntryHeight);
-                }
+                if (i != colEntries.length - 1) {
+                    let interEntrySpaceCount = 2**(colIndex + 1) - 1;
+                    for (let i = 0; i < interEntrySpaceCount; i++) {
+                        addBracketSpace(colId, bracketEntryHeight);
+                    }
+                } 
             }
 
             // Add leading spacing before first element in col
