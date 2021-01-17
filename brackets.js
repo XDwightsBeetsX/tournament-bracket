@@ -110,92 +110,100 @@ function makeBracket() {
     else {
         let bracket = document.getElementById("bracket");
         let bracketEntryHeight = 30;  // px
-        let bracketMatchupSeparation = 20; //px
-        let cols = [];
+        let bracketMatchupSeparation = 20;  //px
 
         // Find nearest 2^n that can fit the number of entries
         let bracketDepth = Math.ceil(Math.log2(Entries.length)) + 1;
         let prettyBracketSize = 2**(bracketDepth - 1);
 
-        let filledBracketEntries = getEntriesFilledWithByes(prettyBracketSize, bracketDepth);
+        // 2D Array filled in with BYEs
+        let filledBracketEntries = getEntriesFilledWithByes(prettyBracketSize);
         
-        // make bracket columns using bracketEntryHeight
-        for (let i = 0; i < bracketDepth; i++) {
+        // Make columns and add entries to each column
+        for (let colIndex = 0; colIndex < bracketDepth; colIndex++) {
+            // Make col
             let col = document.createElement("div");
+            let colHeight = prettyBracketSize * bracketEntryHeight + bracketMatchupSeparation * (prettyBracketSize/2 + (bracketDepth - 2));
+            let colId = "bracket-col-" + colIndex;
             col.className = "bracket-col";
             col.style.width = String(100 / bracketDepth) + "%";
-            let colHeight = prettyBracketSize * bracketEntryHeight + bracketMatchupSeparation * (prettyBracketSize/2 + (bracketDepth - 2));
             col.style.height = String(colHeight) + "px";
-            col.id = "bracket-col-" + i;
+            col.id = colId;
             bracket.appendChild(col);
-            cols.push(col);
-        }
 
-        // fill in cols
-        for (let colIndex = 0; colIndex < bracketDepth; colIndex++) {
-            let currentColId = "bracket-col-" + colIndex;
-            let col = document.getElementById(currentColId);
-            let colPrettyEntryCount = 2**(bracketDepth - colIndex);
-
-            // spacing before first element in col
+            // Add leading spacing before first element in col
             if (colIndex != 0) {
                 let leadingColSpacingCount = 2**(colIndex - 1) / 2;
                 for (i = 0; i < leadingColSpacingCount; i++) {
-                    addBracketSpace(currentColId, bracketMatchupSeparation / 2);
+                    addBracketSpace(colId, bracketMatchupSeparation / 2);
                 }
             }
 
-            // Setup
-            let colDepth = bracketDepth - colIndex;
-            let prettyEntriesInColCount = 2**colDepth;
-            for (i = 0; i < prettyEntriesInColCount; i++) {
+            // Add entries
+            let colEntries = filledBracketEntries[colIndex];
+            for (i = 0; i < colEntries.length; i++) {
                 let entry = document.createElement("div");
                 entry.className = "bracket-entry verdana-gray";
-
-                // Fill first column with entries, winners aren't decided yet
-                if (i == 0) {
-                    entry.innerHTML = filledBracketEntries[i].Name;
-                }
-                else {
-                    entry.innerHTML = "";
-                }
+                entry.innerHTML = colEntries[i].Name;
                 col.appendChild(entry);
 
-                addBracketSpace("bracket-col-0", bracketMatchupSeparation);
+                // Add inter-matchup spacing on all but last last col entry
+                if (i < colEntries.length - 1) {
+                    for (let j = 0; j < Math.log2(prettyBracketSize); j++) {
+                        if ((i+1) % 2**j == 0) {
+                            addBracketSpace(colId, bracketMatchupSeparation);
+                        }
+                    }
+                }
+            }
 
-                if ((i+1) % 2 == 0) {
-                    addBracketSpace("bracket-col-0", bracketMatchupSeparation);
+            // Add trailing spacing before first element in col
+            if (colIndex != 0) {
+                let trailingColSpacingCount = 2**(colIndex - 1) / 2;
+                for (i = 0; i < trailingColSpacingCount; i++) {
+                    addBracketSpace(colId, bracketMatchupSeparation / 2);
                 }
             }
         }
     }
 }
 
-function getEntriesFilledWithByes(prettyBracketSize, bracketDepth) {
+function getEntriesFilledWithByes(prettyBracketSize) {
     /* Creates a 2D copy to return, dont want to mess with actual Entries
      */
+    debugger;
     let filledBracketEntries = [Entries];
+    let newByeEntryCount = prettyBracketSize - filledBracketEntries[0].length;
     
     // Fill first col with byes
-    while (EntriesCopy.length < prettyBracketSize) {
-        let randIndex = getRandomInt(EntriesCopy.length);
+    for (let i = 0; i < newByeEntryCount; i++) {        
         let newByeEntry = new Entry("BYE");
-
-        let swapEntry = filledBracketEntries[0][randIndex];
-        filledBracketEntries[0][randIndex] = newByeEntry;
-        filledBracketEntries[0].push(swapEntry);
+        filledBracketEntries[0].push(newByeEntry);
     }
 
-    // Fill remaining cols with Byes
+    // Swap out byes to make bracket fair
+    let lowI = 1;
+    let highI = prettyBracketSize - 1;
+    while (lowI < highI) {
+        let swapEntry = filledBracketEntries[0][lowI];
+        filledBracketEntries[0][lowI] = filledBracketEntries[0][highI];
+        filledBracketEntries[0][highI] = swapEntry;
+
+        lowI += 2;
+        highI -= 2;
+    }
+
+    // Fill remaining cols with TBDs
     let colSize = prettyBracketSize;
-    for (let col = 1; col < Math.log2(prettyBracketSize); col++) {
+    for (let col = 1; col <= Math.log2(prettyBracketSize); col++) {
         colSize = colSize / 2;
+        filledBracketEntries[col] = [];
         for (let i = 0; i < colSize; i++) {
-            let newByeEntry = new Entry("BYE");
+            let newByeEntry = new Entry("TBD");
             filledBracketEntries[col].push(newByeEntry);
         }
     }
-    
+
     return filledBracketEntries;
 }
 
@@ -205,10 +213,6 @@ function addBracketSpace(colId, spacePx) {
     space.className = "bracket-matchup-separator";
     space.style.height = spacePx + "px";
     col.appendChild(space);
-}
-
-function getRandomInt(max) {
-    return Math.floor(Math.random() * Math.floor(max));
 }
 
 class Entry {
