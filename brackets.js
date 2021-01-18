@@ -69,13 +69,13 @@ function newEntry() {
     else {
         Entries.push(newEntry);
         
-        let newEntryDiv = document.createElement('div');
-        newEntryDiv.innerHTML = newEntry.Name;
-        newEntryDiv.id = LeftPaneNamePrefix + newEntry.Name;
+        let newEntryElement = document.createElement('div');
+        newEntryElement.innerHTML = newEntry.Name;
+        newEntryElement.id = LeftPaneNamePrefix + newEntry.Name;
 
-        addDeleteButtonToNewEntry(newEntryDiv);
+        addDeleteButtonToNewEntry(newEntryElement);
 
-        document.getElementById("entryList").appendChild(newEntryDiv);
+        document.getElementById("entryList").appendChild(newEntryElement);
     }
     // Reset the form to blank string
     input.value = '';    
@@ -116,7 +116,7 @@ function getEntryIndex(EntryName) {
     return null;
 }
 
-function addDeleteButtonToNewEntry(newEntryDiv) {
+function addDeleteButtonToNewEntry(newEntryElement) {
     /* Creates a child "img" element to hold the delete .png
      * adds the onclick method removeEntry(this)
      */
@@ -126,27 +126,26 @@ function addDeleteButtonToNewEntry(newEntryDiv) {
     entryDeleteButton.style.width = "auto";
     entryDeleteButton.style.float = "right";
     entryDeleteButton.className = "pointer";
-    entryDeleteButton.setAttribute('onclick', "deleteEntry(this.parentNode.id)");
+    entryDeleteButton.setAttribute('onclick', "deleteEntry(this.parentNode)");
     entryDeleteButton.setAttribute("alt", "delete entry");
-    newEntryDiv.appendChild(entryDeleteButton);
+    newEntryElement.appendChild(entryDeleteButton);
 }
 
-function deleteEntry(EntryDivId) {
+function deleteEntry(EntryElement) {
     // remove from html document
-    let parent = document.getElementById(EntryDivId);
-    parent.remove();
+    EntryElement.remove();
 
     // remove from entries
     // first "entryName-" prefix to find Entry.Name
-    let entryToRemoveName = EntryDivId.slice(LeftPaneNamePrefix.length);
+    let entryToRemoveName = EntryElement.id.slice(LeftPaneNamePrefix.length);
     let entryToRemoveIndex = getEntryIndex(entryToRemoveName);
     if (entryToRemoveIndex != null) {
         Entries.splice(entryToRemoveIndex, 1);
     }
 }
 
-function clear(elementId) {
-    document.getElementById(elementId).innerHTML = "";
+function clear(element) {
+    element.innerHTML = "";
 }
 
 function makeBracket() {
@@ -155,16 +154,17 @@ function makeBracket() {
      * where some teams may recieve a 'bye' into the next round
      */
 
+    let bracketElement = document.getElementById("bracket");
+
     // CASE 1: no entries
     if (Entries.length == 0) {
-        clear("bracket");
-        let bracket =  document.getElementById('bracket');
+        clear(bracketElement);
 
         // Bracket wrapper for single entry
         let singleEntryDiv = document.createElement('div');
         singleEntryDiv.className = "single-entry";
         singleEntryDiv.style.textAlign = "center";
-        bracket.appendChild(singleEntryDiv);
+        bracketElement.appendChild(singleEntryDiv);
 
         // Add descriptive entry
         let entryDiv = document.createElement('div');
@@ -175,14 +175,13 @@ function makeBracket() {
     }
     // CASE 2: one entry
     else if (Entries.length == 1) {
-        clear("bracket");
-        let bracket =  document.getElementById("bracket");
+        clear(bracketElement);
 
         // Bracket wrapper for single entry
         let singleEntryDiv = document.createElement("div");
         singleEntryDiv.className = "single-entry";
         singleEntryDiv.style.textAlign = "center";
-        bracket.appendChild(singleEntryDiv);
+        bracketElement.appendChild(singleEntryDiv);
 
         // Add descriptive entry
         let entryDiv = document.createElement("div");
@@ -193,8 +192,7 @@ function makeBracket() {
     }
     // CASE 3: 2+ entries, typical
     else {
-        clear("bracket");
-        let bracket = document.getElementById("bracket");
+        clear(bracketElement);
         let bracketEntryHeight = 30;  // px
 
         // Find nearest 2^n that can fit the number of entries
@@ -214,7 +212,7 @@ function makeBracket() {
             col.style.width = 100 / bracketDepth + "%";
             col.style.height = colHeight + "px";
             col.id = colId;
-            bracket.appendChild(col);
+            bracketElement.appendChild(col);
 
             // Add leading spacing before first element in col
             if (colIndex != 0) {
@@ -234,7 +232,7 @@ function makeBracket() {
                 entry.innerHTML = entryName;
                 
                 if (entryName != BYE && entryName != TBD) {
-                    addAdvanceArrowToDiv(entry);
+                    addAdvanceArrowToEntryElement(entry);
                 }
                 
                 col.appendChild(entry);
@@ -297,7 +295,7 @@ function getEntriesFilledWithByes(prettyBracketSize) {
     return filledBracketEntries;
 }
 
-function addAdvanceArrowToDiv(EntryDiv) {
+function addAdvanceArrowToEntryElement(EntryElement) {
     /* Creates a child "img" element to hold the delete .png
      * adds the onclick method removeEntry(this)
      */
@@ -309,35 +307,42 @@ function addAdvanceArrowToDiv(EntryDiv) {
     advanceButton.className = "pointer";
     advanceButton.setAttribute('onclick', "advanceThisEntry(this.parentNode.id)");
     advanceButton.setAttribute("alt", "advance entry");
-    EntryDiv.appendChild(advanceButton);
+    EntryElement.appendChild(advanceButton);
 }
 
-function removeAdvanceArrowFromDiv(EntryDiv) {
+function removeAdvanceArrowFromEntryElement(EntryElement) {
     /* Assumes the firstElementChild of EntryDiv is the advance arrow
      */
-    let advanceArrowImg = EntryDiv.firstElementChild;
-    EntryDiv.removeChild(advanceArrowImg);
+    let advanceArrowImg = EntryElement.firstElementChild;
+    EntryElement.removeChild(advanceArrowImg);
 }
 
 function advanceThisEntry(entryDivId) {
-    // find the place where the advanced entry goes
+    // find the entry and the advance location
     let currColIndex = parseInt(entryDivId.slice(BracketColPrefix.length));
     let currColRow = parseInt(entryDivId.slice(BracketRowPrefix.length));
+    let entryToAdvance = FilledBracketEntries[currColIndex][currColRow];
     let advanceIndexInNextCol = Math.ceil((currColRow + 1) / 2) - 1;
 
     // get the elements at the new index
-    let entryToAdvanceDiv = document.getElementById(entryDivId);
+    let entryToAdvanceElement = document.getElementById(entryDivId);
     let nextColIndex = currColIndex + 1;
     let entryToReplaceName = FilledBracketEntries[nextColIndex][advanceIndexInNextCol].Name;
     let entryIdToReplace = BracketColPrefix + nextColIndex + "-row-" + advanceIndexInNextCol + "-entry-" + entryToReplaceName;
-    let replaceWithEntryToAdvance = document.getElementById(entryIdToReplace);
+
+    // Update FilledBracketEntries
+    FilledBracketEntries[nextColIndex][advanceIndexInNextCol] = entryToAdvance;
 
     // Change the content of the next round winner to the advanced div
     // this takes care of adding the advance arrow
-    replaceWithEntryToAdvance.innerHTML = entryToAdvanceDiv.innerHTML;
+    let replaceWithEntryToAdvance = document.getElementById(entryIdToReplace);
+    replaceWithEntryToAdvance.innerHTML = entryToAdvanceElement.innerHTML;
+    let entryName = FilledBracketEntries[currColIndex][currColRow].Name;
+    let updatedEntryId = BracketColPrefix + nextColIndex + "-row-" + advanceIndexInNextCol + "-entry-" + entryName;
+    replaceWithEntryToAdvance.id = updatedEntryId;
 
-    // Remove the "advance" arrow from winners place in lower bracket
-    removeAdvanceArrowFromDiv(entryToAdvanceDiv);
+    // Remove "advance" arrow from winner of matchup
+    removeAdvanceArrowFromEntryElement(entryToAdvanceElement);
 
     // Remove "advance" arrow from loser of matchup
     let matchupLoserRow = currColRow;
@@ -351,7 +356,15 @@ function advanceThisEntry(entryDivId) {
     if (matchupLoserName != BYE && matchupLoserName != TBD) {
         let matchupLoserId = BracketColPrefix + currColIndex + "-row-" + matchupLoserRow + "-entry-" + matchupLoserName;
         let matchupLoser = document.getElementById(matchupLoserId);
-        removeAdvanceArrowFromDiv(matchupLoser);
+        removeAdvanceArrowFromEntryElement(matchupLoser);
+    }
+
+    // Remove "advance" arrow from winner of entire bracket
+    if (nextColIndex == FilledBracketEntries.length - 1) {
+        let winnerName = FilledBracketEntries[nextColIndex][0].Name;
+        let winnerId = BracketColPrefix + nextColIndex + "-row-" + 0 + "-entry-" + winnerName;
+        let winnerEntryElement = document.getElementById(winnerId);
+        removeAdvanceArrowFromEntryElement(winnerEntryElement);
     }
 }
 
