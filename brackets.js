@@ -2,6 +2,18 @@
 /*======== Globals ==========*/
 /*===========================*/
 var Entries = [];
+var FilledBracketEntries = [];
+var BYE = "BYE";
+var TBD = "TBD";
+var InvalidEntryNames = ["", BYE, TBD];
+
+// IDS FOLLOW NAMING SCHEME:
+// left pane        bracket
+// entry-Name       bracket-col-#-row-#-entry-Name
+var LeftPaneNamePrefix = "entry-";
+var BracketColPrefix = "bracket-col-";
+var BracketRowPrefix = "bracket-col-#-row-";
+var BracketNamePrefix = "bracket-col-#-row-#-entry-";
 
 
 /*===========================*/
@@ -59,7 +71,7 @@ function newEntry() {
         
         let newEntryDiv = document.createElement('div');
         newEntryDiv.innerHTML = newEntry.Name;
-        newEntryDiv.id = "entryName-" + newEntry.Name;
+        newEntryDiv.id = LeftPaneNamePrefix + newEntry.Name;
 
         addDeleteButtonToNewEntry(newEntryDiv);
 
@@ -70,11 +82,17 @@ function newEntry() {
 }
 
 function isValidEntry(newEntry) {
-    let flag = true;
-    if (newEntry.Name == '' || newEntry.Name == undefined) {
-        flag = false;
+    if (newEntry.Name == undefined) {
+        return false;
     }
-    return flag;
+
+    let newEntryName = newEntry.Name;
+    for (let i = 0; i < InvalidEntryNames.length; i++) {
+        if (newEntryName == InvalidEntryNames[i]) {
+            return false;
+        }
+    }
+    return true;
 }
 
 function isEntryUnique(newEntry) {
@@ -108,19 +126,19 @@ function addDeleteButtonToNewEntry(newEntryDiv) {
     entryDeleteButton.style.width = "auto";
     entryDeleteButton.style.float = "right";
     entryDeleteButton.className = "pointer";
-    entryDeleteButton.setAttribute('onclick', "removeEntryFromDivId(this.parentNode.id)");
+    entryDeleteButton.setAttribute('onclick', "deleteEntry(this.parentNode.id)");
     entryDeleteButton.setAttribute("alt", "delete entry");
     newEntryDiv.appendChild(entryDeleteButton);
 }
 
-function removeEntryFromDivId(EntryDivId) {
+function deleteEntry(EntryDivId) {
     // remove from html document
     let parent = document.getElementById(EntryDivId);
     parent.remove();
 
     // remove from entries
     // first "entryName-" prefix to find Entry.Name
-    let entryToRemoveName = EntryDivId.slice(10);
+    let entryToRemoveName = EntryDivId.slice(LeftPaneNamePrefix.length);
     let entryToRemoveIndex = getEntryIndex(entryToRemoveName);
     if (entryToRemoveIndex != null) {
         Entries.splice(entryToRemoveIndex, 1);
@@ -183,8 +201,8 @@ function makeBracket() {
         let bracketDepth = Math.ceil(Math.log2(Entries.length)) + 1;
         let prettyBracketSize = 2**(bracketDepth - 1);
 
-        // 2D Array of Entries filled in with BYEs and TBDs
-        let filledBracketEntries = getEntriesFilledWithByes(prettyBracketSize);
+        // Set a (global) 2D Array of Entries filled in with BYEs and TBDs
+        FilledBracketEntries = getEntriesFilledWithByes(prettyBracketSize);
         
         // Make columns and add entries to each column
         for (let colIndex = 0; colIndex < bracketDepth; colIndex++) {
@@ -207,11 +225,18 @@ function makeBracket() {
             }
 
             // Add entries
-            let colEntries = filledBracketEntries[colIndex];
+            let colEntries = FilledBracketEntries[colIndex];
             for (i = 0; i < colEntries.length; i++) {
                 let entry = document.createElement("div");
+                let entryName = colEntries[i].Name;
                 entry.className = "bracket-entry verdana-gray";
-                entry.innerHTML = colEntries[i].Name;
+                entry.id = BracketColPrefix + colIndex + "-row-" + i + "-entry-" + entryName;
+                entry.innerHTML = entryName;
+                
+                if (entryName != BYE && entryName != TBD) {
+                    addAdvanceArrowToDiv(entry);
+                }
+                
                 col.appendChild(entry);
 
                 // Add inter-Entry spacing
@@ -242,7 +267,7 @@ function getEntriesFilledWithByes(prettyBracketSize) {
     
     // Fill first col with byes
     for (let i = 0; i < newByeEntryCount; i++) {        
-        let newByeEntry = new Entry("BYE");
+        let newByeEntry = new Entry(BYE);
         filledBracketEntries[0].push(newByeEntry);
     }
 
@@ -270,6 +295,64 @@ function getEntriesFilledWithByes(prettyBracketSize) {
     }
 
     return filledBracketEntries;
+}
+
+function addAdvanceArrowToDiv(EntryDiv) {
+    /* Creates a child "img" element to hold the delete .png
+     * adds the onclick method removeEntry(this)
+     */
+    let advanceButton = document.createElement("img");
+    advanceButton.src = "img/button-arrow-right.png";
+    advanceButton.style.height = 100 + "%";
+    advanceButton.style.width = "auto";
+    advanceButton.style.float = "right";
+    advanceButton.className = "pointer";
+    advanceButton.setAttribute('onclick', "advanceThisEntry(this.parentNode.id)");
+    advanceButton.setAttribute("alt", "advance entry");
+    EntryDiv.appendChild(advanceButton);
+}
+
+function removeAdvanceArrowFromDiv(EntryDiv) {
+    /* Assumes the firstElementChild of EntryDiv is the advance arrow
+     */
+    let advanceArrowImg = EntryDiv.firstElementChild;
+    EntryDiv.removeChild(advanceArrowImg);
+}
+
+function advanceThisEntry(entryDivId) {
+    // find the place where the advanced entry goes
+    let currColIndex = parseInt(entryDivId.slice(BracketColPrefix.length));
+    let currColRow = parseInt(entryDivId.slice(BracketRowPrefix.length));
+    let advanceIndexInNextCol = Math.ceil((currColRow + 1) / 2) - 1;
+
+    // get the elements at the new index
+    let entryToAdvanceDiv = document.getElementById(entryDivId);
+    let nextColIndex = currColIndex + 1;
+    let entryToReplaceName = FilledBracketEntries[nextColIndex][advanceIndexInNextCol].Name;
+    let entryIdToReplace = BracketColPrefix + nextColIndex + "-row-" + advanceIndexInNextCol + "-entry-" + entryToReplaceName;
+    let replaceWithEntryToAdvance = document.getElementById(entryIdToReplace);
+
+    // Change the content of the next round winner to the advanced div
+    // this takes care of adding the advance arrow
+    replaceWithEntryToAdvance.innerHTML = entryToAdvanceDiv.innerHTML;
+
+    // Remove the "advance" arrow from winners place in lower bracket
+    removeAdvanceArrowFromDiv(entryToAdvanceDiv);
+
+    // Remove "advance" arrow from loser of matchup
+    let matchupLoserRow = currColRow;
+    if (matchupLoserRow % 2 == 0) {
+        matchupLoserRow += 1;
+    }
+    else {
+        matchupLoserRow -= 1;
+    }
+    let matchupLoserName = FilledBracketEntries[currColIndex][matchupLoserRow].Name;
+    if (matchupLoserName != BYE && matchupLoserName != TBD) {
+        let matchupLoserId = BracketColPrefix + currColIndex + "-row-" + matchupLoserRow + "-entry-" + matchupLoserName;
+        let matchupLoser = document.getElementById(matchupLoserId);
+        removeAdvanceArrowFromDiv(matchupLoser);
+    }
 }
 
 function addBracketSpace(colId, spacePx) {
