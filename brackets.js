@@ -200,7 +200,7 @@ function makeBracket() {
         let prettyBracketSize = 2**(bracketDepth - 1);
 
         // Set a (global) 2D Array of Entries filled in with BYEs and TBDs
-        FilledBracketEntries = getEntriesFilledWithByes(prettyBracketSize);
+        FilledBracketEntries = getFilledBracketEntries(prettyBracketSize);
         
         // Make columns and add entries to each column
         for (let colIndex = 0; colIndex < bracketDepth; colIndex++) {
@@ -254,10 +254,34 @@ function makeBracket() {
                 }
             }
         }
+
+        // Check if any teams have first round BYEs and advance them
+        advanceAnyByes();
     }
 }
 
-function getEntriesFilledWithByes(prettyBracketSize) {
+function advanceAnyByes() {
+    /* Called immediately after bracket creation to
+     * move forward any teams that may have first round BYEs
+     */
+    let firstRoundEntries = FilledBracketEntries[0];
+    for (let i = 0; i < firstRoundEntries.length; i+=2) {
+        let matchupTopName = FilledBracketEntries[0][i].Name;
+        let matchupBottomName = FilledBracketEntries[0][i+1].Name;
+        if (matchupTopName == BYE) {
+            let entryToAdvanceId = BracketColPrefix + 0 + "-row-" + (i+1) + "-entry-" + matchupBottomName;
+            let entryToAdvanceElement = document.getElementById(entryToAdvanceId);
+            advanceThisEntry(entryToAdvanceElement);
+        }
+        else if (matchupBottomName == BYE) {
+            let entryToAdvanceId = BracketColPrefix + 0 + "-row-" + i + "-entry-" + matchupTopName;
+            let entryToAdvanceElement = document.getElementById(entryToAdvanceId);
+            advanceThisEntry(entryToAdvanceElement);
+        }
+    }
+}
+
+function getFilledBracketEntries(prettyBracketSize) {
     /* Creates a 2D copy to return, dont want to mess with actual Entries
      */
     let filledBracketEntries = [deepCopy(Entries)];
@@ -305,7 +329,7 @@ function addAdvanceArrowToEntryElement(EntryElement) {
     advanceButton.style.width = "auto";
     advanceButton.style.float = "right";
     advanceButton.className = "pointer";
-    advanceButton.setAttribute('onclick', "advanceThisEntry(this.parentNode.id)");
+    advanceButton.setAttribute('onclick', "advanceThisEntry(this.parentNode)");
     advanceButton.setAttribute("alt", "advance entry");
     EntryElement.appendChild(advanceButton);
 }
@@ -317,25 +341,25 @@ function removeAdvanceArrowFromEntryElement(EntryElement) {
     EntryElement.removeChild(advanceArrowImg);
 }
 
-function advanceThisEntry(entryDivId) {
+function advanceThisEntry(entryElement) {
     // find the entry and the advance location
-    let currColIndex = parseInt(entryDivId.slice(BracketColPrefix.length));
-    let currColRow = parseInt(entryDivId.slice(BracketRowPrefix.length));
+    let currColIndex = parseInt(entryElement.id.slice(BracketColPrefix.length));
+    let currColRow = parseInt(entryElement.id.slice(BracketRowPrefix.length));
     let entryToAdvance = FilledBracketEntries[currColIndex][currColRow];
     let advanceIndexInNextCol = Math.ceil((currColRow + 1) / 2) - 1;
 
     // get the elements at the new index
-    let entryToAdvanceElement = document.getElementById(entryDivId);
+    let entryToAdvanceElement = document.getElementById(entryElement.id);
     let nextColIndex = currColIndex + 1;
     let entryToReplaceName = FilledBracketEntries[nextColIndex][advanceIndexInNextCol].Name;
-    let entryIdToReplace = BracketColPrefix + nextColIndex + "-row-" + advanceIndexInNextCol + "-entry-" + entryToReplaceName;
+    let entryToReplaceId = BracketColPrefix + nextColIndex + "-row-" + advanceIndexInNextCol + "-entry-" + entryToReplaceName;
 
     // Update FilledBracketEntries
     FilledBracketEntries[nextColIndex][advanceIndexInNextCol] = entryToAdvance;
 
     // Change the content of the next round winner to the advanced div
     // this takes care of adding the advance arrow
-    let replaceWithEntryToAdvance = document.getElementById(entryIdToReplace);
+    let replaceWithEntryToAdvance = document.getElementById(entryToReplaceId);
     replaceWithEntryToAdvance.innerHTML = entryToAdvanceElement.innerHTML;
     let entryName = FilledBracketEntries[currColIndex][currColRow].Name;
     let updatedEntryId = BracketColPrefix + nextColIndex + "-row-" + advanceIndexInNextCol + "-entry-" + entryName;
