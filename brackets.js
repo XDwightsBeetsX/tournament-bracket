@@ -341,54 +341,74 @@ function removeAdvanceArrowFromEntryElement(EntryElement) {
     EntryElement.removeChild(advanceArrowImg);
 }
 
+function canAdvanceAnEntry(col) {
+    /* Checks if an entryElement in the FilledBracketEntries col
+     * can be advanced
+     */
+    let filledEntriesInCol = FilledBracketEntries[col];
+    for (let i = 0; i < filledEntriesInCol.length; i++) {
+        if (filledEntriesInCol[i].Name == TBD) {
+            return false;
+        }
+    }
+    return true;
+}
+
 function advanceThisEntry(entryElement) {
-    // find the entry and the advance location
+    /* Effectively moves the entryElement to the next stage of the bracket.
+     * Also does the following:
+     *      - checks if entryElement should/can be advanced
+     *      - removes "advance" arrows from prev round and loser
+     *      - removes "advance" arrow from self if winner of entire bracket
+     */
     let currColIndex = parseInt(entryElement.id.slice(BracketColPrefix.length));
-    let currColRow = parseInt(entryElement.id.slice(BracketRowPrefix.length));
-    let entryToAdvance = FilledBracketEntries[currColIndex][currColRow];
-    let advanceIndexInNextCol = Math.ceil((currColRow + 1) / 2) - 1;
-
-    // get the elements at the new index
-    let entryToAdvanceElement = document.getElementById(entryElement.id);
-    let nextColIndex = currColIndex + 1;
-    let entryToReplaceName = FilledBracketEntries[nextColIndex][advanceIndexInNextCol].Name;
-    let entryToReplaceId = BracketColPrefix + nextColIndex + "-row-" + advanceIndexInNextCol + "-entry-" + entryToReplaceName;
-
-    // Update FilledBracketEntries
-    FilledBracketEntries[nextColIndex][advanceIndexInNextCol] = entryToAdvance;
-
-    // Change the content of the next round winner to the advanced div
-    // this takes care of adding the advance arrow
-    let replaceWithEntryToAdvance = document.getElementById(entryToReplaceId);
-    replaceWithEntryToAdvance.innerHTML = entryToAdvanceElement.innerHTML;
-    let entryName = FilledBracketEntries[currColIndex][currColRow].Name;
-    let updatedEntryId = BracketColPrefix + nextColIndex + "-row-" + advanceIndexInNextCol + "-entry-" + entryName;
-    replaceWithEntryToAdvance.id = updatedEntryId;
-
-    // Remove "advance" arrow from winner of matchup
-    removeAdvanceArrowFromEntryElement(entryToAdvanceElement);
-
-    // Remove "advance" arrow from loser of matchup
-    let matchupLoserRow = currColRow;
-    if (matchupLoserRow % 2 == 0) {
-        matchupLoserRow += 1;
-    }
-    else {
-        matchupLoserRow -= 1;
-    }
-    let matchupLoserName = FilledBracketEntries[currColIndex][matchupLoserRow].Name;
-    if (matchupLoserName != BYE && matchupLoserName != TBD) {
-        let matchupLoserId = BracketColPrefix + currColIndex + "-row-" + matchupLoserRow + "-entry-" + matchupLoserName;
-        let matchupLoser = document.getElementById(matchupLoserId);
-        removeAdvanceArrowFromEntryElement(matchupLoser);
-    }
-
-    // Remove "advance" arrow from winner of entire bracket
-    if (nextColIndex == FilledBracketEntries.length - 1) {
-        let winnerName = FilledBracketEntries[nextColIndex][0].Name;
-        let winnerId = BracketColPrefix + nextColIndex + "-row-" + 0 + "-entry-" + winnerName;
-        let winnerEntryElement = document.getElementById(winnerId);
-        removeAdvanceArrowFromEntryElement(winnerEntryElement);
+    if (canAdvanceAnEntry(currColIndex)) {
+        let currColRow = parseInt(entryElement.id.slice(BracketRowPrefix.length));
+        let entryToAdvance = FilledBracketEntries[currColIndex][currColRow];
+        let advanceIndexInNextCol = Math.ceil((currColRow + 1) / 2) - 1;
+    
+        // get the elements at the new index
+        let entryToAdvanceElement = document.getElementById(entryElement.id);
+        let nextColIndex = currColIndex + 1;
+        let entryToReplaceName = FilledBracketEntries[nextColIndex][advanceIndexInNextCol].Name;
+        let entryToReplaceId = BracketColPrefix + nextColIndex + "-row-" + advanceIndexInNextCol + "-entry-" + entryToReplaceName;
+    
+        // Update FilledBracketEntries
+        FilledBracketEntries[nextColIndex][advanceIndexInNextCol] = entryToAdvance;
+    
+        // Change the content of the next round winner to the advanced div
+        // this takes care of adding the advance arrow
+        let replaceWithEntryToAdvance = document.getElementById(entryToReplaceId);
+        replaceWithEntryToAdvance.innerHTML = entryToAdvanceElement.innerHTML;
+        let entryName = FilledBracketEntries[currColIndex][currColRow].Name;
+        let updatedEntryId = BracketColPrefix + nextColIndex + "-row-" + advanceIndexInNextCol + "-entry-" + entryName;
+        replaceWithEntryToAdvance.id = updatedEntryId;
+    
+        // Remove "advance" arrow from winner of matchup
+        removeAdvanceArrowFromEntryElement(entryToAdvanceElement);
+    
+        // Remove "advance" arrow from loser of matchup
+        let matchupLoserRow = currColRow;
+        if (matchupLoserRow % 2 == 0) {
+            matchupLoserRow += 1;
+        }
+        else {
+            matchupLoserRow -= 1;
+        }
+        let matchupLoserName = FilledBracketEntries[currColIndex][matchupLoserRow].Name;
+        if (matchupLoserName != BYE && matchupLoserName != TBD) {
+            let matchupLoserId = BracketColPrefix + currColIndex + "-row-" + matchupLoserRow + "-entry-" + matchupLoserName;
+            let matchupLoser = document.getElementById(matchupLoserId);
+            removeAdvanceArrowFromEntryElement(matchupLoser);
+        }
+    
+        // Remove "advance" arrow from winner of entire bracket
+        if (nextColIndex == FilledBracketEntries.length - 1) {
+            let winnerName = FilledBracketEntries[nextColIndex][0].Name;
+            let winnerId = BracketColPrefix + nextColIndex + "-row-" + 0 + "-entry-" + winnerName;
+            let winnerEntryElement = document.getElementById(winnerId);
+            removeAdvanceArrowFromEntryElement(winnerEntryElement);
+        }
     }
 }
 
