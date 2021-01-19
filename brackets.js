@@ -366,27 +366,27 @@ function advanceThisEntry(entryElement) {
         let currColRow = parseInt(entryElement.id.slice(BracketRowPrefix.length));
         let entryToAdvance = FilledBracketEntries[currColIndex][currColRow];
         let advanceIndexInNextCol = Math.ceil((currColRow + 1) / 2) - 1;
-    
+
         // get the elements at the new index
         let entryToAdvanceElement = document.getElementById(entryElement.id);
         let nextColIndex = currColIndex + 1;
         let entryToReplaceName = FilledBracketEntries[nextColIndex][advanceIndexInNextCol].Name;
         let entryToReplaceId = BracketColPrefix + nextColIndex + "-row-" + advanceIndexInNextCol + "-entry-" + entryToReplaceName;
-    
+        let replaceWithEntryToAdvance = document.getElementById(entryToReplaceId);
+
         // Update FilledBracketEntries
         FilledBracketEntries[nextColIndex][advanceIndexInNextCol] = entryToAdvance;
-    
+
         // Change the content of the next round winner to the advanced div
         // this takes care of adding the advance arrow
-        let replaceWithEntryToAdvance = document.getElementById(entryToReplaceId);
         replaceWithEntryToAdvance.innerHTML = entryToAdvanceElement.innerHTML;
         let entryName = FilledBracketEntries[currColIndex][currColRow].Name;
         let updatedEntryId = BracketColPrefix + nextColIndex + "-row-" + advanceIndexInNextCol + "-entry-" + entryName;
         replaceWithEntryToAdvance.id = updatedEntryId;
-    
+
         // Remove "advance" arrow from winner of matchup
         removeAdvanceArrowFromEntryElement(entryToAdvanceElement);
-    
+        
         // Remove "advance" arrow from loser of matchup
         let matchupLoserRow = currColRow;
         if (matchupLoserRow % 2 == 0) {
