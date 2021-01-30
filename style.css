@@ -67,7 +67,7 @@
 /*===========================*/
 /*======= Right Pane ========*/
 /*===========================*/
-#right-pane {
+/* #right-pane {
     float: right;
     width: 10%;
     height: 100%;
@@ -76,7 +76,7 @@
 }
 #right-pane div {
     padding: 10px;
-}
+} */
 
 
 /*===========================*/
@@ -84,8 +84,9 @@
 /*===========================*/
 #content {
     float: left;
-    width: 68%;
-    margin: 10px 1%;
+    width: 79%;
+    margin-top: 10px;
+    margin-left: 1%;
     height: 100%;
     min-height: 100px;
 }
