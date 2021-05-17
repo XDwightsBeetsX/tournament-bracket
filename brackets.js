@@ -137,7 +137,14 @@ function deleteEntryFromList(entry) {
         Entries.splice(entryToRemoveIndex, 1);
     }
 }
-
+function getEntry(name) {
+    for (let i = 0; i < Entries.length; i++) {
+        if (Entries[i].Name == name) {
+            return Entries[i];
+        }
+    }
+    return null;
+}
 
 /*===========================*/
 /*=== Bracket Operations ====*/
@@ -330,10 +337,42 @@ function addAdvanceArrowToElement(entryElement) {
 
 function returnElement(entryElement) {
     let currCol = parseInt(entryElement.id.slice(BracketColPrefix.length));
-    if (currCol != 0) {
-        let currRow = parseInt(entryElement.id.slice(BracketRowPrefix.length));
+    let currRow = parseInt(entryElement.id.slice(BracketRowPrefix.length));
+    if (currCol > 0) {
+        //  Update Bracket
+        let oldName = Bracket[currCol][currRow];
         delete Bracket[currCol][currRow];
         Bracket[currCol][currRow] = TBD;
+        
+        //  Clear current Element
+        entryElement.removeChild(entryElement.firstElementChild);  // remove "advance" arrow
+        if (getEntry(oldName).GamesPlayed > 0 && currCol < Bracket.length - 1) {
+            entryElement.removeChild(entryElement.lastElementChild);  //  remove "return" arrow
+        }
+        entryElement.id = BracketColPrefix + currCol + "-row-" + currRow + "-entry-" + TBD;
+        entryElement.innerText = TBD;
+
+        // Add arrows to prev matchup elements
+        let prevMatchupRow = 2*currRow;
+        let prevMatchupCol = currCol - 1;
+        let prevMatchupTopName = Bracket[prevMatchupCol][prevMatchupRow];
+        let prevMatchupBotName = Bracket[prevMatchupCol][prevMatchupRow+1];
+        let prevMatchupTopEntry = getEntry(prevMatchupTopName);
+        let prevMatchupBotEntry = getEntry(prevMatchupBotName);
+
+        prevMatchupTopEntry.GamesPlayed -= 1;
+        prevMatchupBotEntry.GamesPlayed -= 1;
+
+        let prevMatchupTopElement = document.getElementById(BracketColPrefix + prevMatchupCol + "-row-" + prevMatchupRow + "-entry-" + prevMatchupTopName);
+        let prevMatchupBotElement = document.getElementById(BracketColPrefix + prevMatchupCol + "-row-" + (prevMatchupRow+1) + "-entry-" + prevMatchupBotName);
+        addAdvanceArrowToElement(prevMatchupTopElement);
+        addAdvanceArrowToElement(prevMatchupBotElement);
+        if (prevMatchupTopEntry.GamesPlayed > 0) {
+            addReturnArrowToElement(prevMatchupTopElement);
+        }
+        if (prevMatchupBotEntry.GamesPlayed > 0) {
+            addReturnArrowToElement(prevMatchupBotElement);
+        }
     }
 }
 function advanceElement(entryElement) {
@@ -350,25 +389,25 @@ function advanceElement(entryElement) {
 
     let currCol = parseInt(entryElement.id.slice(BracketColPrefix.length));
     let currRow = parseInt(entryElement.id.slice(BracketRowPrefix.length));
-    if (canAdvanceAnEntry(currCol)) {
-        // Remove arrows from winner in old column
-        entryElement.removeChild(entryElement.firstElementChild);  // remove advance arrow
-        if (currCol != 0){
-            entryElement.removeChild(entryElement.lastElementChild);  // remove return arrow
-        }
-        
+    if (canAdvanceAnEntry(currCol)) {       
         // Update Bracket
         let nextCol = currCol + 1;
         let nextRow = Math.ceil((currRow + 1) / 2) - 1;
         winnerName = Bracket[currCol][currRow];
         Bracket[nextCol][nextRow] = winnerName;
 
+        // Remove arrows from winner in old column
+        entryElement.removeChild(entryElement.firstElementChild);  // remove advance arrow
+        if (getEntry(winnerName).GamesPlayed > 0){
+            entryElement.removeChild(entryElement.lastElementChild);  // remove return arrow
+        }
+
         // find the Element at the new index
         let entryToReplaceId = BracketColPrefix + nextCol + "-row-" + nextRow + "-entry-" + TBD;
         let entryElementToReplace = document.getElementById(entryToReplaceId);
 
         // replace the content of the next div over to be the winner
-        entryElementToReplace.innerText = entryElement.innerText;
+        entryElementToReplace.innerText = winnerName;
         entryElementToReplace.id = BracketColPrefix + nextCol + "-row-" + nextRow + "-entry-" + winnerName;
         addAdvanceArrowToElement(entryElementToReplace);
         
@@ -385,8 +424,15 @@ function advanceElement(entryElement) {
         if (matchupLoser != BYE && matchupLoser != TBD) {
             let matchupLoserId = BracketColPrefix + currCol + "-row-" + matchupLoserRow + "-entry-" + matchupLoser;
             let matchupLoserElement = document.getElementById(matchupLoserId);
-            matchupLoserElement.removeChild(matchupLoserElement.firstElementChild);
+            matchupLoserElement.removeChild(matchupLoserElement.firstElementChild);  // remove advance arrow
             addReturnArrowToElement(entryElementToReplace);
+            let loserEntry = getEntry(matchupLoser);
+            if (loserEntry.GamesPlayed > 0) {
+                matchupLoserElement.removeChild(matchupLoserElement.lastElementChild);  //  remove return arrow
+            }
+            //  After checking previous gamesPlayed, update
+            loserEntry.GamesPlayed += 1;
+            getEntry(winnerName).GamesPlayed += 1;
         }
     
         // Remove "advance" arrow from winner of entire bracket
