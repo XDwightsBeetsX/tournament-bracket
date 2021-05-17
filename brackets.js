@@ -193,10 +193,16 @@ function makeBracket() {
         space.style.width = 100 + "%";
         col.appendChild(space);
     }
+    function clearEntries() {
+        for (let i = 0; i < Entries.length; i++) {
+            Entries[i].GamesPlayed = 0;
+        }
+    }
 
 
     let bracketElement = document.getElementById("bracket");
     bracketElement.innerHTML = "";  // clear any old bracket
+    clearEntries();
 
     //  CASE 1: no entries
     if (Entries.length == 0) {
@@ -398,7 +404,7 @@ function advanceElement(entryElement) {
 
         // Remove arrows from winner in old column
         entryElement.removeChild(entryElement.firstElementChild);  // remove advance arrow
-        if (getEntry(winnerName).GamesPlayed > 0){
+        if (getEntry(winnerName).GamesPlayed > 0) {
             entryElement.removeChild(entryElement.lastElementChild);  // remove return arrow
         }
 
