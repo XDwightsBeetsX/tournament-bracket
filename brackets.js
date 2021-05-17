@@ -1,13 +1,13 @@
 /*===========================*/
-/*======== Globals ==========*/
+/*====== 'G'lobals ==========*/
 /*===========================*/
-var Entries = [];
-var FilledBracketEntries = [];
-var BYE = "BYE";
-var TBD = "TBD";
+var Entries = [];       // List of Type Entry
+var Bracket = [[]];     // 2D List of Entry Name strings
+const BYE = "BYE";
+const TBD = "TBD";
 var InvalidEntryNames = ["", BYE, TBD];
 
-// IDS FOLLOW NAMING SCHEME:
+// IDs FOLLOW NAMING SCHEME:
 // left pane        bracket
 // entry-Name       bracket-col-#-row-#-entry-Name
 var LeftPaneNamePrefix = "entry-";
@@ -24,7 +24,6 @@ window.onload = function() {
     listenForEntry();
     Entries = [];
 }
-
 window.onbeforeunload = function() {
     // Prevents unintentional refreshing, which loses data
     Entries = [];
@@ -49,11 +48,54 @@ function listenForEntry() {
 
 
 /*===========================*/
-/*========= Dynamic =========*/
+/*===== Helper Classes ======*/
 /*===========================*/
-function newEntry() {
-    /* Reads in new entry and resets the input box
-     */
+class Entry {
+    constructor(name) {
+        this.Name = name;
+        this.GamesPlayed = 0;
+    }
+}
+
+
+/*===========================*/
+/*======= Entries List ======*/
+/*===========================*/
+function addNewEntryToList() {
+    function isValidEntry(newEntry) {
+        if (newEntry.Name == undefined) {
+            return false;
+        }
+    
+        let newEntryName = newEntry.Name;
+        for (let i = 0; i < InvalidEntryNames.length; i++) {
+            if (newEntryName == InvalidEntryNames[i]) {
+                return false;
+            }
+        }
+        return true;
+    }
+    function isEntryUnique(newEntry) {
+        for (let i = 0; i < Entries.length; i++) {
+            if (Entries[i].Name == newEntry.Name) {
+                return false;
+            }
+        }
+        return true;
+    }
+    function addDeleteButtonToNewEntry(newEntry) {
+        let button = document.createElement("img");
+        button.src = "img/button-x.png";
+        button.style.height = 100 + "%";
+        button.style.width = "auto";
+        button.style.float = "right";
+        button.className = "pointer";
+        button.setAttribute('onclick', "deleteEntryFromList(this.parentNode)");
+        button.setAttribute("alt", "delete entry");
+        newEntry.appendChild(button);
+    }
+
+
     let input = document.getElementById("entry");
     let val = input.value;
     let newEntry = new Entry(val);
@@ -68,98 +110,89 @@ function newEntry() {
     }
     else {
         Entries.push(newEntry);
-        
         let newEntryElement = document.createElement('div');
         newEntryElement.innerHTML = newEntry.Name;
         newEntryElement.id = LeftPaneNamePrefix + newEntry.Name;
-
         addDeleteButtonToNewEntry(newEntryElement);
-
         document.getElementById("entryList").appendChild(newEntryElement);
     }
     // Reset the form to blank string
     input.value = '';    
 }
-
-function isValidEntry(newEntry) {
-    if (newEntry.Name == undefined) {
-        return false;
-    }
-
-    let newEntryName = newEntry.Name;
-    for (let i = 0; i < InvalidEntryNames.length; i++) {
-        if (newEntryName == InvalidEntryNames[i]) {
-            return false;
+function deleteEntryFromList(entry) {
+    function getEntryIndex(entryName) {
+        for (let i = 0; i < Entries.length; i++) {
+            if (Entries[i].Name == entryName) {
+                return i;
+            }
         }
+        return null;  // not found
     }
-    return true;
-}
-
-function isEntryUnique(newEntry) {
-    for (let i = 0; i < Entries.length; i++) {
-        if (Entries[i].Name == newEntry.Name) {
-            return false;
-        }
-    }
-    return true;
-}
-
-function getEntryIndex(EntryName) {
-    /* Returns the index of the Entry in Entries
-     * If not found, returns null
-     */
-    for (let i = 0; i < Entries.length; i++) {
-        if (Entries[i].Name == EntryName) {
-            return i;
-        }
-    }
-    return null;
-}
-
-function addDeleteButtonToNewEntry(newEntryElement) {
-    /* Creates a child "img" element to hold the delete .png
-     * adds the onclick method removeEntry(this)
-     */
-    let entryDeleteButton = document.createElement("img");
-    entryDeleteButton.src = "img/button-x.png";
-    entryDeleteButton.style.height = 100 + "%";
-    entryDeleteButton.style.width = "auto";
-    entryDeleteButton.style.float = "right";
-    entryDeleteButton.className = "pointer";
-    entryDeleteButton.setAttribute('onclick', "deleteEntry(this.parentNode)");
-    entryDeleteButton.setAttribute("alt", "delete entry");
-    newEntryElement.appendChild(entryDeleteButton);
-}
-
-function deleteEntry(EntryElement) {
-    // remove from html document
-    EntryElement.remove();
-
-    // remove from entries
-    // first "entryName-" prefix to find Entry.Name
-    let entryToRemoveName = EntryElement.id.slice(LeftPaneNamePrefix.length);
+    
+    
+    entry.remove();
+    let entryToRemoveName = entry.id.slice(LeftPaneNamePrefix.length);
     let entryToRemoveIndex = getEntryIndex(entryToRemoveName);
     if (entryToRemoveIndex != null) {
         Entries.splice(entryToRemoveIndex, 1);
     }
 }
 
-function clear(element) {
-    element.innerHTML = "";
-}
 
+/*===========================*/
+/*=== Bracket Operations ====*/
+/*===========================*/
 function makeBracket() {
-    /* Creates a bracket with list of Entries
-     * Displays bracket in columns,
-     * where some teams may recieve a 'bye' into the next round
-     */
+    function setBracket(prettyBracketSize) {
+        // Initialize first column with the Entries List
+        let bracketEntries = [];
+        for (let i = 0; i < Entries.length; i++) {
+            bracketEntries.push(Entries[i].Name);
+        }
+        Bracket = [bracketEntries];
+        
+        // Fill first col with byes
+        let newByeEntryCount = prettyBracketSize - Bracket[0].length;
+        for (let i = 0; i < newByeEntryCount; i++) {        
+            Bracket[0].push(BYE);
+        }
+    
+        // Swap out byes to make bracket fair
+        let lowI = 1;
+        let highI = prettyBracketSize - 1;
+        while (lowI < highI) {
+            let swapEntry = Bracket[0][lowI];
+            Bracket[0][lowI] = Bracket[0][highI];
+            Bracket[0][highI] = swapEntry;
+            lowI += 2;
+            highI -= 2;
+        }
+    
+        // Fill remaining cols with TBDs
+        let colSize = prettyBracketSize;
+        for (let col = 1; col <= Math.log2(prettyBracketSize); col++) {
+            colSize = colSize / 2;
+            Bracket[col] = [];
+            for (let i = 0; i < colSize; i++) {
+                Bracket[col].push(TBD);
+            }
+        }
+    }
+    function addBracketSpace(colId, spacePx) {
+        let col = document.getElementById(colId);
+        let space = document.createElement("div");
+        space.className = "bracket-matchup-separator";
+        space.style.height = spacePx + "px";
+        space.style.width = 100 + "%";
+        col.appendChild(space);
+    }
+
 
     let bracketElement = document.getElementById("bracket");
+    bracketElement.innerHTML = "";  // clear any old bracket
 
-    // CASE 1: no entries
+    //  CASE 1: no entries
     if (Entries.length == 0) {
-        clear(bracketElement);
-
         // Bracket wrapper for single entry
         let singleEntryDiv = document.createElement('div');
         singleEntryDiv.className = "single-entry";
@@ -173,38 +206,34 @@ function makeBracket() {
         entryDiv.style.display = "inline";
         singleEntryDiv.appendChild(entryDiv);
     }
-    // CASE 2: one entry
+    //  CASE 2: one entry
     else if (Entries.length == 1) {
-        clear(bracketElement);
-
-        // Bracket wrapper for single entry
+        //  Bracket wrapper for single entry
         let singleEntryDiv = document.createElement("div");
         singleEntryDiv.className = "single-entry";
         singleEntryDiv.style.textAlign = "center";
         bracketElement.appendChild(singleEntryDiv);
 
-        // Add descriptive entry
+        //  Add descriptive entry
         let entryDiv = document.createElement("div");
         entryDiv.innerHTML = "One Entry: " + Entries[0].Name;
         entryDiv.className = "bracket-entry";
         entryDiv.style.display = "inline";
         singleEntryDiv.appendChild(entryDiv);
     }
-    // CASE 3: 2+ entries, typical
+    //  CASE 3: 2+ entries, typical
     else {
-        clear(bracketElement);
         let bracketEntryHeight = 30;  // px
 
-        // Find nearest 2^n that can fit the number of entries
+        //  Set Global Bracket
+        //      Find nearest 2^n that can fit the number of entries
         let bracketDepth = Math.ceil(Math.log2(Entries.length)) + 1;
         let prettyBracketSize = 2**(bracketDepth - 1);
-
-        // Set a (global) 2D Array of Entries filled in with BYEs and TBDs
-        FilledBracketEntries = getFilledBracketEntries(prettyBracketSize);
+        setBracket(prettyBracketSize);
         
-        // Make columns and add entries to each column
+        //  Make columns and add entries to each column
         for (let colIndex = 0; colIndex < bracketDepth; colIndex++) {
-            // Make col
+            //  Make col
             let col = document.createElement("div");
             let colHeight = bracketEntryHeight * (2**bracketDepth - 1);
             let colId = "bracket-col-" + colIndex;
@@ -214,7 +243,7 @@ function makeBracket() {
             col.id = colId;
             bracketElement.appendChild(col);
 
-            // Add leading spacing before first element in col
+            //  Add leading spacing before first element in col
             if (colIndex != 0) {
                 let leadingSpaceCount = 2**colIndex - 1;
                 for (let i = 0; i < leadingSpaceCount; i++) {
@@ -222,23 +251,24 @@ function makeBracket() {
                 }
             }
 
-            // Add entries
-            let colEntries = FilledBracketEntries[colIndex];
+            //  Add entries
+            let colEntries = Bracket[colIndex];
             for (i = 0; i < colEntries.length; i++) {
-                let entry = document.createElement("div");
-                let entryName = colEntries[i].Name;
-                entry.className = "bracket-entry verdana-gray";
-                entry.id = BracketColPrefix + colIndex + "-row-" + i + "-entry-" + entryName;
-                entry.innerHTML = entryName;
+                let entryElement = document.createElement("div");
+                let entry = colEntries[i];
+                entryElement.className = "bracket-entry verdana-gray";
+                entryElement.id = BracketColPrefix + colIndex + "-row-" + i + "-entry-" + entry;
+                entryElement.innerHTML = entry;
                 
-                if (entryName != BYE && entryName != TBD) {
-                    addAdvanceArrowToEntryElement(entry);
+                //  EntryElements begin with both arrows
+                if (entry != BYE && entry != TBD) {
+                    addAdvanceArrowToElement(entryElement);
                 }
                 
-                col.appendChild(entry);
+                col.appendChild(entryElement);
 
                 // Add inter-Entry spacing
-                if (i != colEntries.length - 1) {
+                if (i != col.length - 1) {
                     let interEntrySpaceCount = 2**(colIndex + 1) - 1;
                     for (let i = 0; i < interEntrySpaceCount; i++) {
                         addBracketSpace(colId, bracketEntryHeight);
@@ -256,183 +286,115 @@ function makeBracket() {
         }
 
         // Check if any teams have first round BYEs and advance them
-        advanceAnyByes();
-    }
-}
-
-function advanceAnyByes() {
-    /* Called immediately after bracket creation to
-     * move forward any teams that may have first round BYEs
-     */
-    let firstRoundEntries = FilledBracketEntries[0];
-    for (let i = 0; i < firstRoundEntries.length; i+=2) {
-        let matchupTopName = FilledBracketEntries[0][i].Name;
-        let matchupBottomName = FilledBracketEntries[0][i+1].Name;
-        if (matchupTopName == BYE) {
-            let entryToAdvanceId = BracketColPrefix + 0 + "-row-" + (i+1) + "-entry-" + matchupBottomName;
-            let entryToAdvanceElement = document.getElementById(entryToAdvanceId);
-            advanceThisEntry(entryToAdvanceElement);
-        }
-        else if (matchupBottomName == BYE) {
-            let entryToAdvanceId = BracketColPrefix + 0 + "-row-" + i + "-entry-" + matchupTopName;
-            let entryToAdvanceElement = document.getElementById(entryToAdvanceId);
-            advanceThisEntry(entryToAdvanceElement);
+        let firstCol = Bracket[0];
+        for (let i = 0; i < firstCol.length; i+=2) {
+            let matchupTopName = firstCol[i];
+            let matchupBottomName = firstCol[i+1];
+            if (matchupTopName == BYE) {
+                let winnerId = BracketColPrefix + 0 + "-row-" + (i+1) + "-entry-" + matchupBottomName;
+                let winner = document.getElementById(winnerId);
+                advanceElement(winner);
+            }
+            else if (matchupBottomName == BYE) {
+                let winnerId = BracketColPrefix + 0 + "-row-" + i + "-entry-" + matchupTopName;
+                let winner = document.getElementById(winnerId);
+                advanceElement(winner);
+            }
         }
     }
 }
 
-function getFilledBracketEntries(prettyBracketSize) {
-    /* Creates a 2D copy to return, dont want to mess with actual Entries
-     */
-    let filledBracketEntries = [deepCopy(Entries)];
-    let newByeEntryCount = prettyBracketSize - filledBracketEntries[0].length;
-    
-    // Fill first col with byes
-    for (let i = 0; i < newByeEntryCount; i++) {        
-        let newByeEntry = new Entry(BYE);
-        filledBracketEntries[0].push(newByeEntry);
-    }
 
-    // Swap out byes to make bracket fair
-    let lowI = 1;
-    let highI = prettyBracketSize - 1;
-    while (lowI < highI) {
-        let swapEntry = filledBracketEntries[0][lowI];
-        filledBracketEntries[0][lowI] = filledBracketEntries[0][highI];
-        filledBracketEntries[0][highI] = swapEntry;
-
-        lowI += 2;
-        highI -= 2;
-    }
-
-    // Fill remaining cols with TBDs
-    let colSize = prettyBracketSize;
-    for (let col = 1; col <= Math.log2(prettyBracketSize); col++) {
-        colSize = colSize / 2;
-        filledBracketEntries[col] = [];
-        for (let i = 0; i < colSize; i++) {
-            let newByeEntry = new Entry("TBD");
-            filledBracketEntries[col].push(newByeEntry);
-        }
-    }
-
-    return filledBracketEntries;
+function addReturnArrowToElement(entryElement) {
+    let returnButton = document.createElement("img");
+    returnButton.src = "img/button-arrow-left.png";
+    returnButton.style.height = 100 + "%";
+    returnButton.style.width = "auto";
+    returnButton.style.float = "left";
+    returnButton.className = "pointer";
+    returnButton.setAttribute("alt", "return entry");
+    returnButton.setAttribute('onclick', "returnElement(this.parentNode)");
+    entryElement.appendChild(returnButton);
 }
-
-function addAdvanceArrowToEntryElement(EntryElement) {
-    /* Creates a child "img" element to hold the delete .png
-     * adds the onclick method removeEntry(this)
-     */
+function addAdvanceArrowToElement(entryElement) {
     let advanceButton = document.createElement("img");
     advanceButton.src = "img/button-arrow-right.png";
     advanceButton.style.height = 100 + "%";
     advanceButton.style.width = "auto";
     advanceButton.style.float = "right";
     advanceButton.className = "pointer";
-    advanceButton.setAttribute('onclick', "advanceThisEntry(this.parentNode)");
+    advanceButton.setAttribute('onclick', "advanceElement(this.parentNode)");
     advanceButton.setAttribute("alt", "advance entry");
-    EntryElement.appendChild(advanceButton);
+    entryElement.appendChild(advanceButton);
 }
 
-function removeAdvanceArrowFromEntryElement(EntryElement) {
-    /* Assumes the firstElementChild of EntryDiv is the advance arrow
-     */
-    let advanceArrowImg = EntryElement.firstElementChild;
-    EntryElement.removeChild(advanceArrowImg);
-}
-
-function canAdvanceAnEntry(col) {
-    /* Checks if an entryElement in the FilledBracketEntries col
-     * can be advanced
-     */
-    let filledEntriesInCol = FilledBracketEntries[col];
-    for (let i = 0; i < filledEntriesInCol.length; i++) {
-        if (filledEntriesInCol[i].Name == TBD) {
-            return false;
-        }
+function returnElement(entryElement) {
+    let currCol = parseInt(entryElement.id.slice(BracketColPrefix.length));
+    if (currCol != 0) {
+        let currRow = parseInt(entryElement.id.slice(BracketRowPrefix.length));
+        delete Bracket[currCol][currRow];
+        Bracket[currCol][currRow] = TBD;
     }
-    return true;
 }
+function advanceElement(entryElement) {
+    function canAdvanceAnEntry(col) {
+        let filledEntriesInCol = Bracket[col];
+        for (let i = 0; i < filledEntriesInCol.length; i++) {
+            if (filledEntriesInCol[i] == TBD) {
+                return false;
+            }
+        }
+        return true;
+    }
 
-function advanceThisEntry(entryElement) {
-    /* Effectively moves the entryElement to the next stage of the bracket.
-     * Also does the following:
-     *      - checks if entryElement should/can be advanced
-     *      - removes "advance" arrows from prev round and loser
-     *      - removes "advance" arrow from self if winner of entire bracket
-     */
-    let currColIndex = parseInt(entryElement.id.slice(BracketColPrefix.length));
-    if (canAdvanceAnEntry(currColIndex)) {
-        let currColRow = parseInt(entryElement.id.slice(BracketRowPrefix.length));
-        let entryToAdvance = FilledBracketEntries[currColIndex][currColRow];
-        let advanceIndexInNextCol = Math.ceil((currColRow + 1) / 2) - 1;
 
-        // get the elements at the new index
-        let entryToAdvanceElement = document.getElementById(entryElement.id);
-        let nextColIndex = currColIndex + 1;
-        let entryToReplaceName = FilledBracketEntries[nextColIndex][advanceIndexInNextCol].Name;
-        let entryToReplaceId = BracketColPrefix + nextColIndex + "-row-" + advanceIndexInNextCol + "-entry-" + entryToReplaceName;
-        let replaceWithEntryToAdvance = document.getElementById(entryToReplaceId);
-
-        // Update FilledBracketEntries
-        FilledBracketEntries[nextColIndex][advanceIndexInNextCol] = entryToAdvance;
-
-        // Change the content of the next round winner to the advanced div
-        // this takes care of adding the advance arrow
-        replaceWithEntryToAdvance.innerHTML = entryToAdvanceElement.innerHTML;
-        let entryName = FilledBracketEntries[currColIndex][currColRow].Name;
-        let updatedEntryId = BracketColPrefix + nextColIndex + "-row-" + advanceIndexInNextCol + "-entry-" + entryName;
-        replaceWithEntryToAdvance.id = updatedEntryId;
-
-        // Remove "advance" arrow from winner of matchup
-        removeAdvanceArrowFromEntryElement(entryToAdvanceElement);
+    let currCol = parseInt(entryElement.id.slice(BracketColPrefix.length));
+    let currRow = parseInt(entryElement.id.slice(BracketRowPrefix.length));
+    if (canAdvanceAnEntry(currCol)) {
+        // Remove arrows from winner in old column
+        entryElement.removeChild(entryElement.firstElementChild);  // remove advance arrow
+        if (currCol != 0){
+            entryElement.removeChild(entryElement.lastElementChild);  // remove return arrow
+        }
         
-        // Remove "advance" arrow from loser of matchup
-        let matchupLoserRow = currColRow;
+        // Update Bracket
+        let nextCol = currCol + 1;
+        let nextRow = Math.ceil((currRow + 1) / 2) - 1;
+        winnerName = Bracket[currCol][currRow];
+        Bracket[nextCol][nextRow] = winnerName;
+
+        // find the Element at the new index
+        let entryToReplaceId = BracketColPrefix + nextCol + "-row-" + nextRow + "-entry-" + TBD;
+        let entryElementToReplace = document.getElementById(entryToReplaceId);
+
+        // replace the content of the next div over to be the winner
+        entryElementToReplace.innerText = entryElement.innerText;
+        entryElementToReplace.id = BracketColPrefix + nextCol + "-row-" + nextRow + "-entry-" + winnerName;
+        addAdvanceArrowToElement(entryElementToReplace);
+        
+        //  Remove "advance" arrow from loser of matchup
+        //  Add "return" arrow to winner if they played someone
+        let matchupLoserRow = currRow;
         if (matchupLoserRow % 2 == 0) {
             matchupLoserRow += 1;
         }
         else {
             matchupLoserRow -= 1;
         }
-        let matchupLoserName = FilledBracketEntries[currColIndex][matchupLoserRow].Name;
-        if (matchupLoserName != BYE && matchupLoserName != TBD) {
-            let matchupLoserId = BracketColPrefix + currColIndex + "-row-" + matchupLoserRow + "-entry-" + matchupLoserName;
-            let matchupLoser = document.getElementById(matchupLoserId);
-            removeAdvanceArrowFromEntryElement(matchupLoser);
+        let matchupLoser = Bracket[currCol][matchupLoserRow];
+        if (matchupLoser != BYE && matchupLoser != TBD) {
+            let matchupLoserId = BracketColPrefix + currCol + "-row-" + matchupLoserRow + "-entry-" + matchupLoser;
+            let matchupLoserElement = document.getElementById(matchupLoserId);
+            matchupLoserElement.removeChild(matchupLoserElement.firstElementChild);
+            addReturnArrowToElement(entryElementToReplace);
         }
     
         // Remove "advance" arrow from winner of entire bracket
-        if (nextColIndex == FilledBracketEntries.length - 1) {
-            let winnerName = FilledBracketEntries[nextColIndex][0].Name;
-            let winnerId = BracketColPrefix + nextColIndex + "-row-" + 0 + "-entry-" + winnerName;
+        if (nextCol == Bracket.length - 1) {
+            let winner = Bracket[nextCol][0];
+            let winnerId = BracketColPrefix + nextCol + "-row-" + 0 + "-entry-" + winner;
             let winnerEntryElement = document.getElementById(winnerId);
-            removeAdvanceArrowFromEntryElement(winnerEntryElement);
+            winnerEntryElement.removeChild(winnerEntryElement.firstElementChild);
         }
-    }
-}
-
-function addBracketSpace(colId, spacePx) {
-    let col = document.getElementById(colId);
-    let space = document.createElement("div");
-    space.className = "bracket-matchup-separator";
-    space.style.height = spacePx + "px";
-    space.style.width = 100 + "%";
-    col.appendChild(space);
-}
-
-function deepCopy(array) {
-    let copyArr = [];
-    for (let i = 0; i < array.length; i++) {
-        copyArr.push(array[i]);
-    }
-
-    return copyArr;
-}
-
-class Entry {
-    constructor(name, seed=null) {
-        this.Name = name;
-        this.Seed = seed;
     }
 }
