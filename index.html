@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" style="height: 100%;">
     <head>
         <title>
-            Tournament Brackets!
+            Tournament Bracket Maker
         </title>
         
         <meta charset="utf-8">
@@ -14,35 +14,55 @@
         <script src="brackets.js"></script>
     </head>
 
-    <body id="wrapper-main">
-        <div class="header verdana-gray bg-light-gray">
-            <strong>Tournament Brackets!</strong>
+    <!-- background and page padding -->
+    <body id="wrapper-main" class="bg-white">
+        <div id="wrapper-header" class="bg-light-gray rounded verdana-gray header">
+            <div>Tournament Bracket Maker</div>
         </div>
 
-        <div id="left-pane" class="bg-light-gray">
-            <div id="entryList" class="verdana-gray">
-                Entries:
+        <div id="wrapper-content">            
+            <div id="content">
+                <div id="content-left-pane" class="rounded bg-light-gray">
+                    <div id="left-pane-header", class="verdana-gray">
+                        <div>Entries:</div>
+                    </div>
+
+                    <div id="left-pane-content">
+                        <div id="entryList"></div>
+                    </div>
+                </div>
+
+                <div id="content-main">
+                    <div id="form" class="bg-light-gray rounded">
+                        <div id="add-entry">
+                            <div id="add-entry-prompt" class="verdana-gray">
+                                <span>New Entry:</span>
+                                <input id="entry-name" type="text">
+                            </div>
+                            <div id="add-entry-btn-wrapper">
+                                <div id="add-entry-btn" class="form-btn" onclick="addNewEntryToList()">
+                                    Add Entry
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="make-bracket-btn-wrapper">
+                            <div id="make-bracket-btn" class="form-btn" onclick="makeBracket()">
+                                Make Bracket
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="bracket" class="verdana-gray">            
+                        <!-- FILLS ON makeBracket() CLICK -->
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- <div id="right-pane" class="bg-light-gray">
-            <div class="verdana-gray">
-                W/L or something
-            </div>
-        </div> -->
-
-        <div id="content" class="bg-light-gray">
-            <div id="main-content">
-                <div id="form">
-                    <span class="verdana-gray">New Entry:</span>
-                    <input type="text" id="entry">
-                    <button id="btn-entry-submit" class="pointer" onclick="addNewEntryToList()">Add Entry</button>
-                    <button id="btn-make-bracket" class="pointer" onclick="makeBracket()">Make Bracket</button>
-                </div>
-
-                <div id="bracket" class="verdana-gray">            
-                    <!-- FILLS ON makeBracket() CLICK -->
-                </div>
+        <div id="wrapper-footer" class="bg-light-gray rounded">
+            <div id="footer" class="verdana-gray">
+                <a id="git-link" href="https://github.com/XDwightsBeetsX/tournament-bracket">Check out the GitHub repo</a>
             </div>
         </div>
     </body>

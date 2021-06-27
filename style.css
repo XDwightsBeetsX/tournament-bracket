@@ -5,107 +5,145 @@
     box-sizing: border-box;
 }
 
-
 /*===========================*/
-/*========= Device ==========*/
+/*====== Formtatting ========*/
 /*===========================*/
-/* @media screen and (min-width: 650px) {
-    body{
-        
-    }
-} */
-
-.pointer {
-    cursor: pointer;
+.verdana-gray {
+    font-family: Verdana;
+    color: #8d8d8d;
 }
 
+/*===========================*/
+/*======= Background ========*/
+/*===========================*/
+.bg-gray {
+    background-color: #8d8d8d;
+}
+.bg-light-gray {
+    background-color: #e5e5e5;
+}
+.bg-white {
+    background-color: white;
+}
+.rounded {
+    border-radius: 8px;
+}
 
 /*===========================*/
 /*======== Wrappers =========*/
 /*===========================*/
 #wrapper-main {
+    display: flex;
+    flex-direction: column;
+
     height: 100%;
-    margin: 1%;
-    overflow: auto;
+    
+    margin: 0;
+    padding: 1%;
+}
+#wrapper-header {
+    height: 120px;
+    line-height: 120px;
+
+    font-size: 24pt;
+}
+#wrapper-content {
+    display: flex;
+    flex: 1 0 auto;
+    flex-direction: column;
+}
+#wrapper-footer {
+    display: flex;
+    flex-shrink: 0;
+
+    height: 80px;
+
+    line-height: 80px;
+    font-size: 12pt;
 }
 
 
 /*===========================*/
-/*======== Headings =========*/
+/*======== Headers ==========*/
 /*===========================*/
 .header {
     width: 100%;
-    height: 120px;
     text-align: center;
     vertical-align: middle;
-    line-height: 120px;
-    font-size: 24pt;
 }
-
-
-/*===========================*/
-/*======= Left Pane =========*/
-/*===========================*/
-#left-pane {
-    float: left;
-    width: 20%;
-    height: 100%;
-    min-height: 100px;
-    margin: 10px 0px;
-}
-#entryList {
-    padding: 10px;
-    overflow: hidden;
-}
-#entryList div {
-    margin-top: 10px;
-    padding-left: 20px;
-    height: 20px;
-}
-
-
-/*===========================*/
-/*======= Right Pane ========*/
-/*===========================*/
-/* #right-pane {
-    float: right;
-    width: 10%;
-    height: 100%;
-    min-height: 100px;
-    margin: 10px 0px;
-}
-#right-pane div {
-    padding: 10px;
-} */
 
 
 /*===========================*/
 /*========= Content =========*/
 /*===========================*/
 #content {
-    float: left;
-    width: 79%;
-    margin-top: 10px;
-    margin-left: 1%;
-    height: 100%;
-    min-height: 100px;
+    display: flex;
+    flex-direction: row;
+    margin: 10px 0;
 }
 
-#main-content {
-    margin: 0 10px;
-    height: 100%;
-}
-
-#form {
-    text-align: center;
+/*======= Left Pane =========*/
+#content-left-pane {
+    width: 15%;
     padding: 10px;
 }
-
-#btn-make-bracket {
-    float: right;
-    margin-right: 50px;
+#entryList {
+    overflow-wrap: anywhere;
+}
+#entryList > div {
+    padding: 5px;
 }
 
+/*========== Main ===========*/
+#content-main {
+    width: 85%;
+    margin-left: 10px;
+}
+
+/*========== Form ===========*/
+#form {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    vertical-align: middle;
+    padding: 10px;
+}
+#add-entry {
+    display: flex;
+    flex-direction: row;
+    width: 80%;
+}
+#entry-name {
+    font-family: Verdana;
+    font-size: 10pt;
+    color: #636363;
+}
+#add-entry-btn-wrapper {
+    width: 100%;
+    max-width: 200px;
+    margin: 0 10px;
+}
+.form-btn {
+    height: 100%;
+    margin: 0 auto;
+    
+    font-family: Verdana;
+    color: #8d8d8d;
+    text-align: center;
+
+    border: 2px solid #8d8d8d;
+    border-radius: 8px;
+}
+.form-btn:hover {
+    cursor: pointer;
+    background-color: #636363;
+}
+#make-bracket-btn-wrapper {
+    width: 20%;
+    max-width: 200px;
+}
+
+/*======== Bracket ==========*/
 .bracket-col {
     float: left;
 }
@@ -116,21 +154,18 @@
     padding: 2px 5px;
     text-align: center;
     border-bottom: 2px solid #8d8d8d;
+    overflow-wrap: anywhere;
 }
 
 
 /*===========================*/
-/*========== Text ===========*/
+/*========= Footer ==========*/
 /*===========================*/
-.verdana-gray {
-    font-family: Verdana;
-    color: #8d8d8d;
+#footer {
+    width: 100%;
+    text-align: center;
+
 }
-
-
-/*===========================*/
-/*======= Background ========*/
-/*===========================*/
-.bg-light-gray {
-    background-color: #e5e5e5;
+#footer > #git-link {
+    color: inherit;
 }

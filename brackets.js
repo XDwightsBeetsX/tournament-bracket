@@ -36,11 +36,11 @@ window.onbeforeunload = function() {
 /*===========================*/
 function listenForEntry() {
     // Allows user to shortcut clicking the button by pressing 'Enter' 
-    let input = document.getElementById('entry');
+    let input = document.getElementById('entry-name');
     input.addEventListener('keyup', function(event) {
         if (event.code === 'Enter') {
             event.preventDefault();
-            let submitButton = document.getElementById('btn-entry-submit');
+            let submitButton = document.getElementById('add-entry-btn');
             submitButton.click();
         }
     });
@@ -86,9 +86,8 @@ function addNewEntryToList() {
     function addDeleteButtonToNewEntry(newEntry) {
         let button = document.createElement("img");
         button.src = "img/button-x.png";
-        button.style.height = 100 + "%";
-        button.style.width = "auto";
-        button.style.float = "right";
+        button.style.height = 20 + "px";
+        button.style.width = 20 + "px";
         button.className = "pointer";
         button.setAttribute('onclick', "deleteEntryFromList(this.parentNode)");
         button.setAttribute("alt", "delete entry");
@@ -96,7 +95,7 @@ function addNewEntryToList() {
     }
 
 
-    let input = document.getElementById("entry");
+    let input = document.getElementById("entry-name");
     let val = input.value;
     let newEntry = new Entry(val);
     
@@ -111,8 +110,15 @@ function addNewEntryToList() {
     else {
         Entries.push(newEntry);
         let newEntryElement = document.createElement('div');
-        newEntryElement.innerHTML = newEntry.Name;
-        newEntryElement.id = LeftPaneNamePrefix + newEntry.Name;
+        newEntryElement.style.display = "flex";
+        newEntryElement.style.flexDirection = "row";
+        newEntryElement.style.justifyContent = "space-between";
+        
+        let entryNameElement = document.createElement('div');
+        entryNameElement.innerHTML = newEntry.Name;
+        entryNameElement.id = LeftPaneNamePrefix + newEntry.Name;
+
+        newEntryElement.appendChild(entryNameElement);
         addDeleteButtonToNewEntry(newEntryElement);
         document.getElementById("entryList").appendChild(newEntryElement);
     }
