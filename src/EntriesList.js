@@ -1,16 +1,8 @@
 /*===========================*/
-/*======== Classes ==========*/
+/*====== EntriesList ========*/
 /*===========================*/
-class Entry {
-    constructor(name) {
-        this.Name = name;
-        this.W = 0;
-        this.L = 0;
-    }
-}
 
-
-class Entries {
+class EntriesList {
     constructor() {
         this.Entries = [];
     }
@@ -37,25 +29,5 @@ class Entries {
                 return;
             }
         }
-    }
-}
-
-
-class Bracket {
-    constructor(entries) {
-        // TODO make big bracket w/ TBDs here
-        this.Entries = entries;
-
-        this.Height = (Math.ceil(entries.length / 2) + 1)**2;
-        this.Depth = Math.ceil(Math.log2(entries.length)) + 1;
-    }
-
-    advanceEntryAt(pos) {
-        // do some math to see which index to set entry at
-
-        // set the Entries[index] = Entries[pos]
-
-        // update the DOM in logic.js
-        return;
     }
 }

@@ -82,18 +82,20 @@
     margin: 10px 0;
 }
 
+/* shared by left pane entries and bracket entries */
+.entry {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    overflow-wrap: anywhere;
+}
+
 /*======= Left Pane =========*/
 #content-left-pane {
     width: 15%;
     padding: 10px;
 }
 #entryList {
-    overflow-wrap: anywhere;
-}
-.entrylist-entry {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
     overflow-wrap: anywhere;
 }
 .entrylist-entryname {
@@ -138,11 +140,9 @@
 .form-btn {
     height: 100%;
     margin: 0 auto;
-    
     font-family: Verdana;
     color: #8d8d8d;
     text-align: center;
-
     border: 2px solid #8d8d8d;
     border-radius: 8px;
 }
@@ -156,17 +156,9 @@
 }
 
 /*======== Bracket ==========*/
-.bracket-col {
-    float: left;
-}
-
-.bracket-entry {
-    height: 30px;
-    width: 100%;
-    padding: 2px 5px;
-    text-align: center;
-    border-bottom: 2px solid #8d8d8d;
-    overflow-wrap: anywhere;
+#bracket {
+    display: flex;
+    flex-direction: column;
 }
 
 

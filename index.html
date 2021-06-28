@@ -9,11 +9,17 @@
         
         <link href="style.css" rel="stylesheet"/>
         
-        <!-- order of imports matters -->
+        <!-- 
+            order of imports matters.
+            lower files depend on upper ones.
+        -->
         <script src="src/globals.js"></script>
-        <script src="src/classes.js"></script>
-        <script src="src/logic.js"></script>
+        <script src="src/utils.js"></script>
         <script src="src/event_listeners.js"></script>
+        <script src="src/Entry.js"></script>
+        <script src="src/EntriesList.js"></script>
+        <script src="src/Bracket.js"></script>
+        <script src="src/controller.js"></script>
     </head>
 
     <!-- background and page padding -->

@@ -1,14 +1,11 @@
 /*===========================*/
 /*===== Bracket Logic =======*/
 /*===========================*/
-let E = new Entries(); // Entries
+let E = new EntriesList(); // Entries
 let B; // Bracket
-let EntryList;
+let EntryListElement;
 let BracketElement;
 
-function getEntryName() {
-    return document.getElementById(ID_ENTRY_NAME).value;
-}
 
 // Entries
 function addEntry() {
@@ -17,7 +14,7 @@ function addEntry() {
         // Add entry to Entries object
         E.addEntry(new Entry(entryName));
         
-        // Add newEntryElement to EntryList
+        // Add newEntryElement to EntryListElement
         addEntryElement(entryName); 
         
         // Reset the input field
@@ -39,19 +36,19 @@ function addEntryElement(entryName) {
 
     // Create newEntryElement
     let newEntryElement = document.createElement("div");
-    newEntryElement.className = CLASS_ENTRYLIST_ENTRY;
+    newEntryElement.className = CLASS_ENTRY;
 
     // Add name to newEntryElement
     let newEntryElementName = document.createElement("div");
     newEntryElementName.innerText = entryName;
-    newEntryElementName.className = ENTRYLIST_ENTRYNAME + " " + CLASS_VERDANA_GRAY;
+    newEntryElementName.className = CLASS_ENTRYLIST_ENTRYNAME + " " + CLASS_VERDANA_GRAY;
     newEntryElement.appendChild(newEntryElementName);
     
     // Add delete button to newEntryElement
     addDeleteButtonToNewEntry(newEntryElement);
     
-    // Add newEntryElement to EntryList
-    EntryList.appendChild(newEntryElement);
+    // Add newEntryElement to EntryListElement
+    EntryListElement.appendChild(newEntryElement);
 }
 
 function deleteEntry(entryElement) {
@@ -72,14 +69,8 @@ function makeBracket() {
         alert("only one entry added: '" + E.Entries[0].Name + "'");
     }
     else{
-        // Making the Bracket takes care of filling the Entries array with BYEs and TBDs
+        // Making the Bracket takes care of filling the initial grid with BYEs and TBDs
         B = new Bracket(E.Entries);
-        for (i = 0; i < B.Entries.length; i++) {
-            // Every other entry, starting with the first, will be a real entry
-            if (i % 2 == 0){
-
-            }
-        }
     }
 }
 
