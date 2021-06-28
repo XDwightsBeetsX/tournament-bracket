@@ -1,22 +1,4 @@
 /*===========================*/
-/*====== 'G'lobals ==========*/
-/*===========================*/
-var Entries = [];       // List of Type Entry
-var Bracket = [[]];     // 2D List of Entry Name strings
-const BYE = "BYE";
-const TBD = "TBD";
-var InvalidEntryNames = ["", BYE, TBD];
-
-// IDs FOLLOW NAMING SCHEME:
-// left pane        bracket
-// entry-Name       bracket-col-#-row-#-entry-Name
-var LeftPaneNamePrefix = "entry-";
-var BracketColPrefix = "bracket-col-";
-var BracketRowPrefix = "bracket-col-#-row-";
-var BracketNamePrefix = "bracket-col-#-row-#-entry-";
-
-
-/*===========================*/
 /*===== Window Loading ======*/
 /*===========================*/
 window.onload = function() {
@@ -31,31 +13,7 @@ window.onbeforeunload = function() {
 };
 
 
-/*===========================*/
-/*===== Event Listeners =====*/
-/*===========================*/
-function listenForEntry() {
-    // Allows user to shortcut clicking the button by pressing 'Enter' 
-    let input = document.getElementById('entry-name');
-    input.addEventListener('keyup', function(event) {
-        if (event.code === 'Enter') {
-            event.preventDefault();
-            let submitButton = document.getElementById('add-entry-btn');
-            submitButton.click();
-        }
-    });
-}
 
-
-/*===========================*/
-/*===== Helper Classes ======*/
-/*===========================*/
-class Entry {
-    constructor(name) {
-        this.Name = name;
-        this.GamesPlayed = 0;
-    }
-}
 
 
 /*===========================*/

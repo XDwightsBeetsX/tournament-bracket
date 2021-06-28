@@ -1,9 +1,7 @@
 <!DOCTYPE html>
-<html lang="en" style="height: 100%;">
+<html lang="en" style="height: 100%">
     <head>
-        <title>
-            Tournament Bracket Maker
-        </title>
+        <title>Tournament Bracket Maker</title>
         
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -11,7 +9,11 @@
         
         <link href="style.css" rel="stylesheet"/>
         
-        <script src="brackets.js"></script>
+        <!-- order of imports matters -->
+        <script src="src/globals.js"></script>
+        <script src="src/classes.js"></script>
+        <script src="src/logic.js"></script>
+        <script src="src/event_listeners.js"></script>
     </head>
 
     <!-- background and page padding -->
@@ -28,7 +30,7 @@
                     </div>
 
                     <div id="left-pane-content">
-                        <div id="entryList"></div>
+                        <div id="entry-list"></div>
                     </div>
                 </div>
 
@@ -40,7 +42,7 @@
                                 <input id="entry-name" type="text">
                             </div>
                             <div id="add-entry-btn-wrapper">
-                                <div id="add-entry-btn" class="form-btn" onclick="addNewEntryToList()">
+                                <div id="add-entry-btn" class="form-btn" onclick="addEntry()">
                                     Add Entry
                                 </div>
                             </div>

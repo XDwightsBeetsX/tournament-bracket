@@ -90,8 +90,20 @@
 #entryList {
     overflow-wrap: anywhere;
 }
-#entryList > div {
-    padding: 5px;
+.entrylist-entry {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    overflow-wrap: anywhere;
+}
+.entrylist-entryname {
+    width: 100%;
+    border-bottom: 2px solid #8d8d8d;
+}
+.entrylist-deletebtn {
+    cursor: pointer;
+    width: 20px;
+    height: 20px;
 }
 
 /*========== Main ===========*/
