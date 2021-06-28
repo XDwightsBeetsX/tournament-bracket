@@ -4,8 +4,8 @@
 
 window.onload = function() {
     // Set Global Elements
-    EntryListElement = document.getElementById(ID_ENTRY_LIST);
-    BracketElement = document.getElementById(ID_BRACKET);
+    _EntryListElement = document.getElementById(ID_ENTRY_LIST);
+    _BracketElement = document.getElementById(ID_BRACKET);
 
     // Allows user to shortcut clicking the 'add-entry-btn' by pressing 'Enter' 
     document.getElementById(ID_ENTRY_NAME).addEventListener('keyup', function(event) {

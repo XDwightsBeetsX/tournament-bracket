@@ -35,36 +35,35 @@ class Bracket {
     }
 
     makeBracket() {
+        function getBracketOffsetAt(index) {
+            return 0;
+        }
+
         for (let i = 0; i < this.Height; i++) {
-            let offset = this.getBracketOffsetAt(i);
+            let offset = getBracketOffsetAt(i);
             this.addBracketEntryElement(this.PrettyEntries[i], offset);
         }
     }
 
-    getBracketOffsetAt(index) {
-        return 0;
-    }
     addBracketEntryElement(prettyEntry, pos) {
-        function addAdvanceButtonToBracketEntryElement(bEE) {
+        function addAdvanceButton(bEE) {
             return;
         }
-        function addRevertButtonToBracketEntryElement(bEE) {
+        function addRevertButton(bEE) {
             return;
         }
         // bracketEntryElement
         let bEE = document.createElement("div");
+        bEE.className = CLASS_ENTRY;
+        bEE.innerText = prettyEntry.Name;
         
+        if (True){
+            addAdvanceButton(bEE);
+        }
+        else if (True){
+            addRevertButton(bEE);
+        }
 
-
-        BracketElement.appendChild(bEE);
-    }
-
-    getAdvanceIndexFor(pos) {
-        // do some math to see which index to set entry at
-
-        // set the Entries[index] = Entries[pos]
-
-        // update the DOM in logic.js
-        return;
+        _BracketElement.appendChild(bEE);
     }
 }

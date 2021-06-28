@@ -1,6 +1,10 @@
 /*===========================*/
 /*======== Globals ==========*/
 /*===========================*/
+let _EntriesList;
+let _EntryListElement;
+let _Bracket;
+let _BracketElement;
 
 const IMG_DELETE = "./img/delete.png";
 

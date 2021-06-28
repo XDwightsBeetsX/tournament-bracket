@@ -6,28 +6,42 @@ class EntriesList {
     constructor() {
         this.Entries = [];
     }
-
-    isValidEntry(entryName) {
-        if (INVALID_ENTRY_NAMES.includes(entryName)){
-            return false;
-        }
-        for (let i = 0; i < this.Entries.length; i++){
-            if (this.Entries[i].Name == entryName){
-                return false;
-            }
-        }
-        return true;
-    }
+    
     addEntry(entry) {
+        function addDeleteButtonToNewEntry(newEntryElement) {
+            let button = document.createElement("img");
+            button.src = IMG_DELETE;
+            button.className = CLASS_ENTRYLIST_DELETEBTN;
+            button.setAttribute('onclick', "deleteEntry(this.parentNode)");
+            button.setAttribute("alt", "delete entry button");
+            newEntryElement.appendChild(button);
+        }
+
+        // Create newEntryElement
+        let newEntryElement = document.createElement("div");
+        newEntryElement.className = CLASS_ENTRY;
+
+        // Add name to newEntryElement
+        let newEntryElementName = document.createElement("div");
+        newEntryElementName.innerText = entry.Name;
+        newEntryElementName.className = CLASS_ENTRYLIST_ENTRYNAME + " " + CLASS_VERDANA_GRAY;
+        newEntryElement.appendChild(newEntryElementName);
+
+        // Add delete button to newEntryElement
+        addDeleteButtonToNewEntry(newEntryElement);
+
+        // Add newEntryElement to EntryListElement
+        _EntryListElement.appendChild(newEntryElement);
         this.Entries.push(entry);
     }
 
-    removeEntry(entryName) {
+    removeEntry(entryElement) {
         for (let i = 0; i < this.Entries.length; i++){
             if (this.Entries[i].Name == entryName){
                 this.Entries.splice(i, 1);
-                return;
+                break;
             }
         }
+        entryElement.remove();
     }
 }
