@@ -10,7 +10,7 @@ window.onload = function() {
     _B_Row_Elements = [];
 
     // Allows user to shortcut clicking the 'add-entry-btn' by pressing 'Enter' 
-    document.getElementById(ID_E_NAME).addEventListener('keyup', function(event) {
+    document.getElementById(ID_E_INPUT).addEventListener('keyup', function(event) {
         if (event.key == "Enter") {
             event.preventDefault();
             document.getElementById(ID_ADD_ENTRY_BTN).click();

@@ -9,7 +9,3 @@ function deepCopy(array) {
     });
     return newArr;
 }
-
-function getEntryName() {
-    return document.getElementById(ID_E_NAME).value;
-}

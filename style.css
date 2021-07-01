@@ -102,7 +102,7 @@
     width: 100%;
     border-bottom: 2px solid #8d8d8d;
 }
-.entrylist-deletebtn {
+.el-delete {
     cursor: pointer;
     width: 20px;
     height: 20px;
@@ -127,7 +127,7 @@
     flex-direction: row;
     width: 80%;
 }
-#entry-name {
+#e-name {
     font-family: Verdana;
     font-size: 10pt;
     color: #636363;
@@ -159,13 +159,14 @@
 #bracket {
     display: flex;
     flex-direction: column;
-    /* left justify */
     align-content: flex-start;
+    padding: 10px;
 }
 .be-row {
     display: flex;
     flex-direction: row;
     align-content: space-between;
+    height: 40px;
 }
 .be {
     display: flex;
@@ -174,7 +175,8 @@
 }
 .be > .be-name {
     border-bottom: 2px solid #8d8d8d;
-    width: -webkit-fill-available
+    width: -webkit-fill-available;
+    text-align: center;
 }
 .be > .be-btn {
     width: 20px;

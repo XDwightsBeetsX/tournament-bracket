@@ -11,7 +11,7 @@ class EntriesList {
         function addDeleteButtonToNewEntry(newEntryElement) {
             let button = document.createElement("img");
             button.src = IMG_DELETE;
-            button.className = CLASS_ENTRYLIST_DELETEBTN;
+            button.className = CLASS_EL_DELETE;
             button.setAttribute('onclick', "deleteEntry(this.parentNode)");
             button.setAttribute("alt", "delete entry button");
             newEntryElement.appendChild(button);
@@ -24,7 +24,7 @@ class EntriesList {
         // Add name to newEntryElement
         let newEntryElementName = document.createElement("div");
         newEntryElementName.innerText = entry.Name;
-        newEntryElementName.className = CLASS_ENTRYLIST_ENTRYNAME + " " + CLASS_VERDANA_GRAY;
+        newEntryElementName.className = CLASS_EL_NAME + " " + CLASS_VERDANA_GRAY;
         newEntryElement.appendChild(newEntryElementName);
 
         // Add delete button to newEntryElement

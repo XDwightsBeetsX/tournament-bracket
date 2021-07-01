@@ -37,11 +37,15 @@ class Bracket {
     makeBracket() {
         // add all the bracketEntries to the DOM
         // FORMAT
-        // <div id="bracket">
-        //     <div class="bracket-row">
-        //         <div class="bracket-spacer"></div>
-        //         <div class="bracket-spacer"></div>
-        //         <div class="bracket-entry">EntryName</div>
+        //  <div id="bracket">
+        //      <div class="bracket-row" id="be-row-i">
+        //          <div class="bracket-spacer"></div>
+        //          <div class="bracket-spacer"></div>
+        //          <div class="bracket-entry">
+        //              <div class="be-btn"></div>
+        //              <div class="be-name" id="be-row-i-name-NAME></div>
+        //              <div class="be-btn"></div>
+        //          </div>
         //     </div>
         // </div>
         for (let i = 0; i < this.Height; i++) {
@@ -59,6 +63,7 @@ class Bracket {
             bEERowElement.appendChild(newBEE);
 
             let bEENameElement = document.createElement("div");
+            bEENameElement.id = CLASS_BE_ROW + i + "-name-" + prettyEntry.Name
             bEENameElement.className = CLASS_BE_NAME + " " + CLASS_VERDANA_GRAY;
             bEENameElement.innerText = prettyEntry.Name; 
             newBEE.appendChild(bEENameElement);
@@ -84,19 +89,27 @@ class Bracket {
             for (let ei = i; ei < this.PrettyEntries.length; ei+=i) {
                 let spacerE = document.createElement("div");
                 spacerE.style.width = 100 / this.Depth + "%";                
-                debugger;
                 let rowId = CLASS_BE_ROW + "-" + (ei-1);
-
-                console.log("finding: " + rowId);
                 let rowE = document.getElementById(rowId);
-
                 rowE.prepend(spacerE);
             }
         }
     }
 
     advanceEntries() {
-        return;
+        // Check all even indexes if they are BYEs
+        for (let i = 2; i < this.PrettyEntries.length; i+=2) {
+            if (this.PrettyEntries[i-2].Name == BYE) {
+                // advance this.PrettyEntries[i].Name
+                let winnerElement = document.getElementById(CLASS_BE_ROW + (i-1) + "-name-" + TBD);
+                winnerElement.innerText = this.PrettyEntries[i].Name;
+            }
+            else if (this.PrettyEntries[i].Name == BYE) {
+                // advance this.PrettyEntries[i-2].Name
+                let winnerElement = document.getElementById(CLASS_BE_ROW + (i-1) + "-name-" + TBD);
+                winnerElement.innerText = this.PrettyEntries[i-2].Name;
+            }
+        }
     }
 
     addAdvanceButtonTo(bEE) {

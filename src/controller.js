@@ -16,13 +16,13 @@ function addEntry() {
         return true;
     }
 
-    let entryName = getEntryName();
+    let entryName = document.getElementById(ID_E_INPUT).value;
     if (isValidEntry(entryName)){
         // Add entry to Entries object
         _E_List.addEntry(new Entry(entryName));
         
         // Reset the input field
-        document.getElementById(ID_E_NAME).value = "";
+        document.getElementById(ID_E_INPUT).value = "";
     }
     else{
         alert("invalid entry name - '" + entryName + "'");
