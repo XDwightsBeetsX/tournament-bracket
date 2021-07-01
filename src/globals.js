@@ -1,28 +1,31 @@
 /*===========================*/
 /*======== Globals ==========*/
 /*===========================*/
-let _EntriesList;
-let _EntryListElement;
-let _Bracket;
-let _BracketElement;
+let _E_List;
+let _E_List_Element;
+let _B_Element;
+let _B_Row_Elements;
+console.log(_E_List_Element);
 
 const IMG_DELETE = "./img/delete.png";
+const IMG_ADVANCE = "./img/advance.png";
+const IMG_REVERT = "./img/revert.png";
 
 // DOM IDs
 /* !!! THESE NEED TO MATCH HTML !!! */
 const ID_MAKE_BRACKET_BTN = "make-bracket-btn";
 const ID_ADD_ENTRY_BTN = "add-entry-btn";
-const ID_ENTRY_NAME = "entry-name";
-const ID_ENTRY_LIST = "entry-list";
-const ID_BRACKET = "bracket";
+const ID_E_NAME = "entry-name";
+const ID_E_LIST = "entry-list";
+const ID_B = "bracket";
 
 const CLASS_VERDANA_GRAY = "verdana-gray";
 const CLASS_ENTRY = "entry";
 const CLASS_ENTRYLIST_ENTRYNAME = "entrylist-entryname";
 const CLASS_ENTRYLIST_DELETEBTN = "entrylist-deletebtn";
-const CLASS_BRACKET_ENTRY = "bracket-entry";
-const CLASS_ADVANCE_BTN = "advance-btn";
-const CLASS_REVERT_BTN = "revert-btn";
+const CLASS_BE_ROW = "be-row";
+const CLASS_BE_NAME = "be-name";
+const CLASS_BE_BTN = "be-btn";
 
 // NAMES
 const BYE = "BYE";

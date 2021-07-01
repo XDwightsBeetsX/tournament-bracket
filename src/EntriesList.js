@@ -31,13 +31,13 @@ class EntriesList {
         addDeleteButtonToNewEntry(newEntryElement);
 
         // Add newEntryElement to EntryListElement
-        _EntryListElement.appendChild(newEntryElement);
+        _E_List_Element.appendChild(newEntryElement);
         this.Entries.push(entry);
     }
 
     removeEntry(entryElement) {
         for (let i = 0; i < this.Entries.length; i++){
-            if (this.Entries[i].Name == entryName){
+            if (this.Entries[i].Name == entryElement.firstElementChild.innerText){
                 this.Entries.splice(i, 1);
                 break;
             }

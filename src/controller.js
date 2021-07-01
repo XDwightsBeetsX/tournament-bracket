@@ -1,7 +1,6 @@
 /*===========================*/
 /*====== HTML -> JS =========*/
 /*===========================*/
-_EntriesList = new EntriesList();
 
 // Entries
 function addEntry() {
@@ -9,8 +8,8 @@ function addEntry() {
         if (INVALID_ENTRY_NAMES.includes(entryName)){
             return false;
         }
-        for (let i = 0; i < _EntriesList.Entries.length; i++){
-            if (_EntriesList.Entries[i].Name == entryName){
+        for (let i = 0; i < _E_List.Entries.length; i++){
+            if (_E_List.Entries[i].Name == entryName){
                 return false;
             }
         }
@@ -20,10 +19,10 @@ function addEntry() {
     let entryName = getEntryName();
     if (isValidEntry(entryName)){
         // Add entry to Entries object
-        _EntriesList.addEntry(new Entry(entryName));
+        _E_List.addEntry(new Entry(entryName));
         
         // Reset the input field
-        document.getElementById(ID_ENTRY_NAME).value = "";
+        document.getElementById(ID_E_NAME).value = "";
     }
     else{
         alert("invalid entry name - '" + entryName + "'");
@@ -32,28 +31,26 @@ function addEntry() {
 
 function deleteEntry(entryElement) {
     // remove this entry from Entries
-    _EntriesList.removeEntry(entryElement);
+    _E_List.removeEntry(entryElement);
 }
 
 // Bracket
 function makeBracket() {
-    let el = _EntriesList.Entries.length;
+    let el = _E_List.Entries.length;
     if (el == 0) {
         alert("no entries added");
     }
     else if (el == 1) {
-        alert("only one entry added: '" + _EntriesList.Entries[0].Name + "'");
+        alert("only one entry added: '" + _E_List.Entries[0].Name + "'");
     }
     else{
+        // Clear the old bracket
+        _B_Element.innerText = "";
+        _B_Row_Elements = [];
+
         // Making the Bracket takes care of filling the initial BYEs and TBDs
-        _Bracket = new Bracket(_EntriesList.Entries);
+        // also takes care of offsetting the DOM TBDs
+        _B = null;
+        _B = new Bracket(_E_List.Entries);
     }
-}
-
-function advanceBracketEntry(entryElement) {
-    return;
-}
-
-function revertBracketEntry(entryElement) {
-    return;
 }
