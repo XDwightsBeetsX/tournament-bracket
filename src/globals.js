@@ -15,16 +15,23 @@ const IMG_REVERT = "./img/revert.png";
 /* !!! THESE NEED TO MATCH HTML !!! */
 const ID_MAKE_BRACKET_BTN = "make-bracket-btn";
 const ID_ADD_ENTRY_BTN = "add-entry-btn";
+
 const ID_E_INPUT = "e-input";
 const ID_E_LIST = "e-list";
+
 const ID_B = "bracket";
-const ID_BE_ROW = "be-row-"
+const ID_BE_ROW = "be-row-";
+const ID_BE = "be-";
 
 const CLASS_VERDANA_GRAY = "verdana-gray";
 const CLASS_ENTRY = "entry";
+
+const CLASS_EL_ROW = "el-row";
 const CLASS_EL_NAME = "el-name";
 const CLASS_EL_DELETE = "el-delete";
+
 const CLASS_BE_ROW = "be-row";
+const CLASS_BE = "be";
 const CLASS_BE_NAME = "be-name";
 const CLASS_BE_BTN = "be-btn";
 

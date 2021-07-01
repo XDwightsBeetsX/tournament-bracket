@@ -19,7 +19,7 @@ class EntriesList {
 
         // Create newEntryElement
         let newEntryElement = document.createElement("div");
-        newEntryElement.className = CLASS_ENTRY;
+        newEntryElement.className = CLASS_EL_ROW;
 
         // Add name to newEntryElement
         let newEntryElementName = document.createElement("div");

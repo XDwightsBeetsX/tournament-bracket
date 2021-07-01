@@ -38,32 +38,34 @@ class Bracket {
         // add all the bracketEntries to the DOM
         // FORMAT
         //  <div id="bracket">
-        //      <div class="bracket-row" id="be-row-i">
-        //          <div class="bracket-spacer"></div>
-        //          <div class="bracket-spacer"></div>
-        //          <div class="bracket-entry">
+        //      <div class="be-row" id="be-row-i">
+        //          <div class="be-spacer"></div>
+        //          <div class="be-spacer"></div>
+        //          <div class="be">
         //              <div class="be-btn"></div>
         //              <div class="be-name" id="be-row-i-name-NAME></div>
         //              <div class="be-btn"></div>
         //          </div>
         //     </div>
         // </div>
+
+        // make be-rows and insert PrettyEntries
         for (let i = 0; i < this.Height; i++) {
             let prettyEntry = this.PrettyEntries[i];
             
             let bEERowElement = document.createElement("div");
-            bEERowElement.id = CLASS_BE_ROW + "-" + i;
+            bEERowElement.id = ID_BE_ROW + i;
             bEERowElement.className = CLASS_BE_ROW;
             bEERowElement.style.width = 100 + "%";
 
             let newBEE = document.createElement("div");
-            newBEE.id = "be-" + i + "-" + prettyEntry.Name;
-            newBEE.className = "be";
+            newBEE.id = ID_BE + i + "-" + prettyEntry.Name;
+            newBEE.className = CLASS_BE;
             newBEE.style.width = 100 / this.Depth + "%";
             bEERowElement.appendChild(newBEE);
 
             let bEENameElement = document.createElement("div");
-            bEENameElement.id = CLASS_BE_ROW + i + "-name-" + prettyEntry.Name
+            bEENameElement.id = ID_BE_ROW + i + "-name-" + prettyEntry.Name
             bEENameElement.className = CLASS_BE_NAME + " " + CLASS_VERDANA_GRAY;
             bEENameElement.innerText = prettyEntry.Name; 
             newBEE.appendChild(bEENameElement);
@@ -89,7 +91,7 @@ class Bracket {
             for (let ei = i; ei < this.PrettyEntries.length; ei+=i) {
                 let spacerE = document.createElement("div");
                 spacerE.style.width = 100 / this.Depth + "%";                
-                let rowId = CLASS_BE_ROW + "-" + (ei-1);
+                let rowId = ID_BE_ROW + (ei-1);
                 let rowE = document.getElementById(rowId);
                 rowE.prepend(spacerE);
             }
@@ -97,17 +99,20 @@ class Bracket {
     }
 
     advanceEntries() {
+        debugger;
         // Check all even indexes if they are BYEs
-        for (let i = 2; i < this.PrettyEntries.length; i+=2) {
-            if (this.PrettyEntries[i-2].Name == BYE) {
+        for (let i = 0; i <= this.PrettyEntries.length-2; i+=4) {
+            if (this.PrettyEntries[i].Name == BYE) {
                 // advance this.PrettyEntries[i].Name
-                let winnerElement = document.getElementById(CLASS_BE_ROW + (i-1) + "-name-" + TBD);
-                winnerElement.innerText = this.PrettyEntries[i].Name;
+                let winnerElement = document.getElementById(ID_BE_ROW + (i+1) + "-name-" + TBD);
+                winnerElement.innerText = this.PrettyEntries[i+2].Name;
+                continue;
             }
-            else if (this.PrettyEntries[i].Name == BYE) {
+            else if (this.PrettyEntries[i+2].Name == BYE) {
                 // advance this.PrettyEntries[i-2].Name
-                let winnerElement = document.getElementById(CLASS_BE_ROW + (i-1) + "-name-" + TBD);
-                winnerElement.innerText = this.PrettyEntries[i-2].Name;
+                let winnerElement = document.getElementById(ID_BE_ROW + (i+1) + "-name-" + TBD);
+                winnerElement.innerText = this.PrettyEntries[i].Name;
+                continue;
             }
         }
     }
