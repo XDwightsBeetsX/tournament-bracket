@@ -169,10 +169,13 @@
     height: 40px;
 }
 .be {
+    display: flex;
+    flex-direction: row;
+    align-content: space-between;
+    border-bottom: 2px solid #8d8d8d;
     padding: 10px;
 }
 .be-name {
-    border-bottom: 2px solid #8d8d8d;
     width: -webkit-fill-available;
     text-align: center;
 }
@@ -180,9 +183,16 @@
     width: 20px;
     height: 20px;
 }
+.be-btn:hover {
+    cursor: pointer;
+}
+.be-btn:hover > img {
+    background-color: lightgray;
+}
 .be-btn > img {
-    width: 100%;
+    width: auto;
     height: 100%;
+    border-radius: 10px;
 }
 
 

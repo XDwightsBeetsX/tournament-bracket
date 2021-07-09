@@ -54,3 +54,7 @@ function makeBracket() {
         _B = new Bracket(_E_List.Entries);
     }
 }
+
+function advanceRowEntry(bracketRowElement) {
+    _B.advanceRowEntry(bracketRowElement);
+}

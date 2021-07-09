@@ -5,7 +5,6 @@ let _E_List;
 let _E_List_Element;
 let _B_Element;
 let _B_Row_Elements;
-console.log(_E_List_Element);
 
 const IMG_DELETE = "./img/delete.png";
 const IMG_ADVANCE = "./img/advance.png";

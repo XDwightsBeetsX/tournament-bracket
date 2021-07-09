@@ -1,11 +1,23 @@
 /*===========================*/
 /*======== Bracket ==========*/
 /*===========================*/
+//  <div id="bracket">
+//      <div class="be-row" id="be-row-ROW">
+//          <div class="be-spacer"></div>
+//          <div class="be-spacer"></div>
+//          <div class="be" id="be-NAME">
+//              <div class="be-btn"></div>
+//              <div class="be-name"></div>
+//              <div class="be-btn"></div>
+//          </div>
+//      </div>
+//  </div>
+
 
 class Bracket {
     constructor(entries) {
         this.RawEntries = deepCopy(entries);
-
+        
         // determine bracket dimensions
         let nearestP2 = 2**(Math.ceil(Math.log2(entries.length)))
         this.Height = 2*nearestP2 - 1;
@@ -17,7 +29,7 @@ class Bracket {
             prettyEntries.push(new Entry(BYE));
         }
         // swap prettyEntries to set byes by default
-        for (let i = 1; i < nearestP2-1; i+=2) {
+        for (let i = 1; i < nearestP2/2; i+=2) {
             let swap = prettyEntries[i];
             prettyEntries[i] = prettyEntries[nearestP2-i];
             prettyEntries[nearestP2-i] = swap;
@@ -35,41 +47,52 @@ class Bracket {
     }
 
     makeBracket() {
-        // add all the bracketEntries to the DOM
-        // FORMAT
-        //  <div id="bracket">
-        //      <div class="be-row" id="be-row-i">
-        //          <div class="be-spacer"></div>
-        //          <div class="be-spacer"></div>
-        //          <div class="be">
-        //              <div class="be-btn"></div>
-        //              <div class="be-name" id="be-row-i-name-NAME></div>
-        //              <div class="be-btn"></div>
-        //          </div>
-        //     </div>
-        // </div>
-
         // make be-rows and insert PrettyEntries
         for (let i = 0; i < this.Height; i++) {
             let prettyEntry = this.PrettyEntries[i];
             
+            // BEE row
             let bEERowElement = document.createElement("div");
             bEERowElement.id = ID_BE_ROW + i;
             bEERowElement.className = CLASS_BE_ROW;
             bEERowElement.style.width = 100 + "%";
 
-            let newBEE = document.createElement("div");
-            newBEE.id = ID_BE + i + "-" + prettyEntry.Name;
-            newBEE.className = CLASS_BE;
-            newBEE.style.width = 100 / this.Depth + "%";
-            bEERowElement.appendChild(newBEE);
+            // BEE
+            let bEE = document.createElement("div");
+            bEE.id = ID_BE + prettyEntry.Name;
+            bEE.className = CLASS_BE;
+            bEE.style.width = 100 / this.Depth + "%";
 
+            //      BEE REVERT ARROW
+            let bEERevertElement = document.createElement("div");
+            bEERevertElement.className = CLASS_BE_BTN;
+
+            let bEERevertImgElement = document.createElement("img");
+            bEERevertImgElement.src = IMG_REVERT;
+            bEERevertImgElement.style.visibility = "hidden";
+            bEERevertElement.appendChild(bEERevertImgElement);
+
+            //      BEE NAME
             let bEENameElement = document.createElement("div");
-            bEENameElement.id = ID_BE_ROW + i + "-name-" + prettyEntry.Name
             bEENameElement.className = CLASS_BE_NAME + " " + CLASS_VERDANA_GRAY;
             bEENameElement.innerText = prettyEntry.Name; 
-            newBEE.appendChild(bEENameElement);
+            bEE.appendChild(bEENameElement);
             
+            //      BEE ADVANCE ARROW
+            let bEEAdvanceElement = document.createElement("div");
+            bEEAdvanceElement.className = CLASS_BE_BTN;
+            bEEAdvanceElement.style.visibility = "hidden";
+            bEEAdvanceElement.setAttribute('onclick', "advanceRowEntry(this.parentNode.parentNode)");
+
+            let bEEAdvancImgElement = document.createElement("img");
+            bEEAdvancImgElement.src = IMG_ADVANCE;
+            bEEAdvanceElement.appendChild(bEEAdvancImgElement);
+
+            // APPEND ELEMENTS
+            bEE.appendChild(bEERevertElement);
+            bEE.appendChild(bEENameElement);
+            bEE.appendChild(bEEAdvanceElement);
+            bEERowElement.appendChild(bEE);
             _B_Element.appendChild(bEERowElement);
             _B_Row_Elements.push(bEERowElement);
         }
@@ -77,10 +100,10 @@ class Bracket {
         // offset entries to make the bracket shape
         this.offsetEntries();
 
-        // advance any entries that have BYEs first round
+        // advance any entries that have BYEs first round. also adds advance arrows to entries
         this.advanceEntries();
     }
-
+    
     offsetEntries() {
         // Go through oddly indexed powers of two that are less than the length of PrettyEntries
         //  2, 4, 8, ...
@@ -91,61 +114,110 @@ class Bracket {
             for (let ei = i; ei < this.PrettyEntries.length; ei+=i) {
                 let spacerE = document.createElement("div");
                 spacerE.style.width = 100 / this.Depth + "%";                
-                let rowId = ID_BE_ROW + (ei-1);
-                let rowE = document.getElementById(rowId);
-                rowE.prepend(spacerE);
+                
+                _B_Row_Elements[ei-1].prepend(spacerE);
             }
         }
     }
 
     advanceEntries() {
-        debugger;
         // Check all even indexes if they are BYEs
-        for (let i = 0; i <= this.PrettyEntries.length-2; i+=4) {
+        for (let i = 0; i < this.PrettyEntries.length; i+=4) {
             if (this.PrettyEntries[i].Name == BYE) {
-                // advance this.PrettyEntries[i].Name
-                let winnerElement = document.getElementById(ID_BE_ROW + (i+1) + "-name-" + TBD);
-                winnerElement.innerText = this.PrettyEntries[i+2].Name;
-                continue;
+                // advance this.PrettyEntries[i+2].Name
+                let winnerName = this.PrettyEntries[i+2].Name;
+                
+                let winnerE = _B_Row_Elements[i+1].lastChild;
+                winnerE.id = ID_BE + winnerName;
+                winnerE.lastChild.style.visibility = "visible";
+
+                let winnerNameE = winnerE.childNodes[1];
+                winnerNameE.innerText = winnerName;
             }
             else if (this.PrettyEntries[i+2].Name == BYE) {
-                // advance this.PrettyEntries[i-2].Name
-                let winnerElement = document.getElementById(ID_BE_ROW + (i+1) + "-name-" + TBD);
-                winnerElement.innerText = this.PrettyEntries[i].Name;
-                continue;
+                // advance this.PrettyEntries[i].Name
+                let winnerName = this.PrettyEntries[i].Name;
+                
+                let winnerE = _B_Row_Elements[i+1].lastChild;
+                winnerE.id = ID_BE + winnerName;
+                winnerE.lastChild.style.visibility = "visible";
+
+                let winnerNameE = winnerE.childNodes[1];
+                winnerNameE.innerText = winnerName;
+            }
+            else {
+                _B_Row_Elements[i].lastChild.lastChild.style.visibility = "visible";
+                _B_Row_Elements[i+2].lastChild.lastChild.style.visibility = "visible";
             }
         }
     }
 
-    addAdvanceButtonTo(bEE) {
-        // <div> to store <img> element
-        let bEEAdvanceElement = document.createElement("div");
-        bEEAdvanceElement.className = CLASS_BE_BTN;
+    advanceRowEntry(bracketRowElement) {
+        // Takes care of advancing a bracket entry
+        function hideArrowsFrom(BEE) {
+            let vis = "hidden";
+            BEE.firstChild.firstChild.style.visibility = vis;
+            BEE.lastChild.firstChild.style.visibility = vis;
+        }
+        function showArrowsFor(BEE) {
+            let vis = "visible";
+            BEE.firstChild.firstChild.style.visibility = vis;
+            BEE.lastChild.firstChild.style.visibility = vis;
+        }
+        function setNewWinner(winnerBEE) {
+            winnerBEE.id = ID_BE + winnerName;
+            winnerBEE.childNodes[1].innerText = winnerName;
+            showArrowsFor(winnerBEE);
 
-        // make the <img>
-        let bEEAdvancImgElement = document.createElement("img");
-        bEEAdvancImgElement.src = IMG_ADVANCE;
+            // set advance button as visible unless overall winner
+            if (winnerBEE.parentNode.childNodes.length == _B.Depth) {
+                winnerBEE.lastChild.firstChild.visibility = "hidden";
+            }            
+        }
 
-        // store the <img> in the parent <div>
-        bEEAdvanceElement.appendChild(bEEAdvancImgElement);
+        // Set matchup vars
+        debugger;
 
-        // Add the bEEAdvanceElement as the first child
-        bEE.childNodes.splice(0, 0, bEEAdvanceElement);
-    }
+        let winnerElement = bracketRowElement.lastChild;
+        let winnerName = winnerElement.childNodes[1].innerText;
 
-    addRevertButtonTo(bEE) {
-        // <div> to store <img> element
-        let bEERevertElement = document.createElement("div");
-        bEERevertElement.className = CLASS_BE_BTN;
+        let bracketRowStuff = bracketRowElement.id.split("-");
+        let thisIndex = parseInt(bracketRowStuff[bracketRowStuff.length-1]);
 
-        // make the <img>
-        let bEERevertImgElement = document.createElement("img");
-        bEERevertImgElement.src = IMG_REVERT;
+        let thisSpacing = bracketRowElement.childElementCount - 1;
+        let matchupSpace = 2**(thisSpacing);
 
-        // store the <img> in the parent <div>
-        bEERevertElement.appendChild(bEERevertImgElement);
+        let topIndex = thisIndex - matchupSpace;
+        let botIndex = thisIndex + matchupSpace;
+        
+        // check which Bracket Row will be for the winner
+        if (_B_Row_Elements.length - 1 < botIndex) {
+            let winnerRow = document.getElementById(ID_BE_ROW + topIndex);
+            let winnerElement = winnerRow.lastChild;
+            setNewWinner(winnerElement);
+        }
+        else if (topIndex < 0) {
+            let winnerRow = document.getElementById(ID_BE_ROW + botIndex);
+            let winnerElement = winnerRow.lastChild;
+            setNewEntry(winnerElement);
+        }
+        else {
+            // check which is the next round of bracket. top or bottom
+            let topRow = document.getElementById(ID_BE_ROW + topIndex);
+            let botRow = document.getElementById(ID_BE_ROW + botIndex);
 
-        // Add the bEERevertElement as the first child
-        bEE.childNodes.splice(0, 0, bEERevertElement);
+            let topSpacing = topRow.childElementCount - 1;
+            let botSpacing = botRow.childElementCount - 1;
+
+            if (topSpacing == thisSpacing + 1) {
+                setNewWinner(topRow.lastChild);
+            }
+            else if (botSpacing == thisSpacing + 1) {
+                setNewWinner(botRow.lastChild);
+            }
+        }
+
+        // Finally, hide the revert/advance arrows
+        hideArrowsFrom(winnerElement);
     }
 }
