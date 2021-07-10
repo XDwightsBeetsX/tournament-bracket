@@ -55,6 +55,10 @@ function makeBracket() {
     }
 }
 
-function advanceRowEntry(bracketRowElement) {
-    _B.advanceRowEntry(bracketRowElement);
+function advanceRowEntry(thisBracketRow) {
+    _B.advanceRowEntry(thisBracketRow);
+}
+
+function revertRowEntry(thisBracketRow) {
+    _B.revertRowEntry(thisBracketRow);
 }

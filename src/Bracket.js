@@ -2,13 +2,16 @@
 /*======== Bracket ==========*/
 /*===========================*/
 //  <div id="bracket">
-//      <div class="be-row" id="be-row-ROW">
-//          <div class="be-spacer"></div>
-//          <div class="be-spacer"></div>
-//          <div class="be" id="be-NAME">
-//              <div class="be-btn"></div>
-//              <div class="be-name"></div>
-//              <div class="be-btn"></div>
+//      <div id="be-row-ROW" class="be-row">
+//          <div></div>
+//          <div id="be-NAME" class="be">
+//              <div class="be-btn">
+//                  <img src="./img/revert.png">
+//              </div>
+//              <div class="be-name">NAME</div>
+//              <div class="be-btn">
+//                  <img src="./img/advance.png">
+//              </div>
 //          </div>
 //      </div>
 //  </div>
@@ -99,13 +102,6 @@ class Bracket {
         }
 
         // offset entries to make the bracket shape
-        this.offsetEntries();
-
-        // advance any entries that have BYEs first round. also adds advance arrows to entries
-        this.advanceEntries();
-    }
-    
-    offsetEntries() {
         // Go through oddly indexed powers of two that are less than the length of PrettyEntries
         //  2, 4, 8, ...
         // (2, 4, 6, ...), (4, 8, 12, ...), (8, 16, 24, ...), ...
@@ -119,9 +115,8 @@ class Bracket {
                 _B_Row_Elements[ei-1].prepend(spacerE);
             }
         }
-    }
 
-    advanceEntries() {
+        // advance any entries that have BYEs first round. also adds advance arrows to entries
         // Check all even indexes if they are BYEs
         for (let i = 0; i < this.PrettyEntries.length; i+=4) {
             if (this.PrettyEntries[i].Name == BYE) {
@@ -153,34 +148,41 @@ class Bracket {
         }
     }
 
-    advanceRowEntry(thisBracketRow) {
-        // Takes care of advancing a bracket entry
-        function hideArrowsFrom(BEE) {
-            let vis = "hidden";
-            BEE.firstChild.firstChild.style.visibility = vis;
-            BEE.lastChild.firstChild.style.visibility = vis;
-        }
-        function setNewWinner(BEE, winnerName) {
-            function showArrowsFor(BEE) {
-                let vis = "visible";
-                BEE.firstChild.firstChild.style.visibility = vis;
-                BEE.lastChild.firstChild.style.visibility = vis;
+    hideArrowsFrom(BEE) {
+        let vis = "hidden";
+        BEE.firstChild.style.visibility = vis;
+        BEE.lastChild.style.visibility = vis;
+    }
+
+    showArrowsFor(BEE) {
+        // Don't show arrows for TBDs
+        if (BEE.childNodes[1].innerText != TBD) {
+            let vis = "visible";
+            let thisSpacing = BEE.parentNode.childNodes.length - 1;
+
+            // first round entries dont need revert arrow
+            if (0 < thisSpacing) {
+                BEE.firstChild.style.visibility = vis;
             }
-
-            BEE.id = ID_BE + winnerName;
-            BEE.childNodes[1].innerText = winnerName;
-            showArrowsFor(BEE);
-
-            // set advance button as hidden if overall winner
-            if (BEE.parentNode.childNodes.length == _B.Depth - 1) {
-                BEE.lastChild.firstChild.visibility = "hidden";
-            }            
+            // winner doesn't need advance arrow 
+            if (thisSpacing < this.Depth - 1) {
+                BEE.lastChild.style.visibility = vis;
+            }
+            // check if this entry had first round bye
+            if (thisSpacing == 1) {
+                let thisRowIndex = parseInt(BEE.parentNode.id.split(ID_BE_ROW)[1]);
+                let prevMatchupTopRow = document.getElementById(ID_BE_ROW + (thisRowIndex-1));
+                let prevMatchupBotRow = document.getElementById(ID_BE_ROW + (thisRowIndex+1));
+                if (prevMatchupTopRow.lastChild.childNodes[1].innerText == BYE || prevMatchupBotRow.lastChild.childNodes[1].innerText == BYE) {
+                    BEE.firstChild.style.visibility = "hidden";
+                }
+            }
         }
+    }
 
-        // Set matchup vars
+    advanceRowEntry(thisBracketRow) {
         let bracketIndexSplit = thisBracketRow.id.split("-");
         let thisIndex = parseInt(bracketIndexSplit[bracketIndexSplit.length-1]);
-        let thisName = thisBracketRow.lastChild.childNodes[1].innerText;
 
         let thisSpacing = thisBracketRow.childElementCount - 1;
         let matchupSize = 2**(thisSpacing);
@@ -191,43 +193,59 @@ class Bracket {
         let botIndex = thisIndex + matchupSize;
         let botRow = document.getElementById(ID_BE_ROW + botIndex);
 
-        debugger;
-        let matchupLoser = null;
-        // Matchup out of bracket bounds - over
-        if (_B_Row_Elements.length - 1 < botIndex) {
-            setNewWinner(topRow.lastChild, thisName);
-            matchupLoser = document.getElementById(ID_BE_ROW + (topIndex - matchupSize));
-        } // Check if top row is the winner
-        else if (topRow != null) {
-            if (topRow.childElementCount - 1 == thisSpacing + 1) {
-                setNewWinner(topRow.lastChild, thisName);
-                matchupLoser = document.getElementById(ID_BE_ROW + (topIndex - matchupSize));
-            }
-        } // Matchup out of bracket bounds - under
-        else if (topIndex < 0) {
-            setNewWinner(botRow.lastChild, thisName);
-            matchupLoser = document.getElementById(ID_BE_ROW + (botIndex + matchupSize));
-        } // Check if bottom row is the winner
-        else if (botRow != null) {
-            if (botRow.childElementCount - 1 == thisSpacing + 1) {
-                setNewWinner(botRow.lastChild, thisName);
-                matchupLoser = document.getElementById(ID_BE_ROW + (botIndex + matchupSize));
-            }
+        let matchupWinnerRow = null;
+        let matchupLoserRow = null;
+
+        // Matchup out of bracket bounds (below)  OR  winner is the top row
+        if (_B_Row_Elements.length - 1 < botIndex || (topRow != null && topRow.childElementCount - 1 == thisSpacing + 1)) {
+            matchupWinnerRow = topRow;
+            matchupLoserRow = document.getElementById(ID_BE_ROW + (topIndex - matchupSize));
+        }
+        // Matchup out of bracket bounds (over)  OR  winner is the bottom row
+        else if (topIndex < 0 || (botRow != null && botRow.childElementCount - 1 == thisSpacing + 1)) {
+            matchupWinnerRow = botRow;
+            matchupLoserRow = document.getElementById(ID_BE_ROW + (botIndex + matchupSize));
         }
         else {
             let msg = "issue advancing: " + winnerName;
             console.log(msg);
             alert(msg);
         }
+
+        // Set winner
+        let winnerName = thisBracketRow.lastChild.childNodes[1].innerText;
+        matchupWinnerRow.lastChild.id = ID_BE + winnerName;
+        matchupWinnerRow.lastChild.childNodes[1].innerText = winnerName;
+        this.showArrowsFor(matchupWinnerRow.lastChild);
         
         // Remove advance/revert arrows from the advanced entry and the matchup loser
-        hideArrowsFrom(thisBracketRow.lastChild);
-        if (matchupLoser != null) {
-            hideArrowsFrom(matchupLoser.lastChild);
+        this.hideArrowsFrom(thisBracketRow.lastChild);
+        if (matchupLoserRow != null) {
+            this.hideArrowsFrom(matchupLoserRow.lastChild);
         }
     }
 
-    revertRowEntry(bracketRowElement) {
-        console.log("asdf");
+    revertRowEntry(thisBracketRow) {
+        let bracketIndexSplit = thisBracketRow.id.split("-");
+        let thisIndex = parseInt(bracketIndexSplit[bracketIndexSplit.length-1]);
+
+        let thisSpacing = thisBracketRow.childElementCount - 1;
+        let prevMatchupSize = 2**(thisSpacing - 1);
+
+        // reset the reverting element to TBD
+        thisBracketRow.lastChild.childNodes[1].innerText = TBD;
+        thisBracketRow.lastChild.id = ID_BE + TBD;
+        this.hideArrowsFrom(thisBracketRow.lastChild);
+
+        // go back and add arrows to the previous matchup
+        // need to check if they can have revert arrows
+        let prevMatchupTopRowIndex = thisIndex - prevMatchupSize;
+        let prevMatchupTopRow = document.getElementById(ID_BE_ROW + prevMatchupTopRowIndex);
+        let prevMatchupBotRowIndex = thisIndex + prevMatchupSize;
+        let prevMatchupBotRow = document.getElementById(ID_BE_ROW + prevMatchupBotRowIndex);
+
+        // show arrows for the previous matchup
+        this.showArrowsFor(prevMatchupTopRow.lastChild);
+        this.showArrowsFor(prevMatchupBotRow.lastChild);
     }
 }
