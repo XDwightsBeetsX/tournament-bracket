@@ -66,10 +66,11 @@ class Bracket {
             //      BEE REVERT ARROW
             let bEERevertElement = document.createElement("div");
             bEERevertElement.className = CLASS_BE_BTN;
+            bEERevertElement.style.visibility = "hidden";
+            bEERevertElement.setAttribute('onclick', "revertRowEntry(this.parentNode.parentNode)");
 
             let bEERevertImgElement = document.createElement("img");
             bEERevertImgElement.src = IMG_REVERT;
-            bEERevertImgElement.style.visibility = "hidden";
             bEERevertElement.appendChild(bEERevertImgElement);
 
             //      BEE NAME
@@ -152,72 +153,81 @@ class Bracket {
         }
     }
 
-    advanceRowEntry(bracketRowElement) {
+    advanceRowEntry(thisBracketRow) {
         // Takes care of advancing a bracket entry
         function hideArrowsFrom(BEE) {
             let vis = "hidden";
             BEE.firstChild.firstChild.style.visibility = vis;
             BEE.lastChild.firstChild.style.visibility = vis;
         }
-        function showArrowsFor(BEE) {
-            let vis = "visible";
-            BEE.firstChild.firstChild.style.visibility = vis;
-            BEE.lastChild.firstChild.style.visibility = vis;
-        }
-        function setNewWinner(winnerBEE) {
-            winnerBEE.id = ID_BE + winnerName;
-            winnerBEE.childNodes[1].innerText = winnerName;
-            showArrowsFor(winnerBEE);
+        function setNewWinner(BEE, winnerName) {
+            function showArrowsFor(BEE) {
+                let vis = "visible";
+                BEE.firstChild.firstChild.style.visibility = vis;
+                BEE.lastChild.firstChild.style.visibility = vis;
+            }
 
-            // set advance button as visible unless overall winner
-            if (winnerBEE.parentNode.childNodes.length == _B.Depth) {
-                winnerBEE.lastChild.firstChild.visibility = "hidden";
+            BEE.id = ID_BE + winnerName;
+            BEE.childNodes[1].innerText = winnerName;
+            showArrowsFor(BEE);
+
+            // set advance button as hidden if overall winner
+            if (BEE.parentNode.childNodes.length == _B.Depth - 1) {
+                BEE.lastChild.firstChild.visibility = "hidden";
             }            
         }
 
         // Set matchup vars
+        let bracketIndexSplit = thisBracketRow.id.split("-");
+        let thisIndex = parseInt(bracketIndexSplit[bracketIndexSplit.length-1]);
+        let thisName = thisBracketRow.lastChild.childNodes[1].innerText;
+
+        let thisSpacing = thisBracketRow.childElementCount - 1;
+        let matchupSize = 2**(thisSpacing);
+
+        let topIndex = thisIndex - matchupSize;
+        let topRow = document.getElementById(ID_BE_ROW + topIndex);
+
+        let botIndex = thisIndex + matchupSize;
+        let botRow = document.getElementById(ID_BE_ROW + botIndex);
+
         debugger;
-
-        let winnerElement = bracketRowElement.lastChild;
-        let winnerName = winnerElement.childNodes[1].innerText;
-
-        let bracketRowStuff = bracketRowElement.id.split("-");
-        let thisIndex = parseInt(bracketRowStuff[bracketRowStuff.length-1]);
-
-        let thisSpacing = bracketRowElement.childElementCount - 1;
-        let matchupSpace = 2**(thisSpacing);
-
-        let topIndex = thisIndex - matchupSpace;
-        let botIndex = thisIndex + matchupSpace;
-        
-        // check which Bracket Row will be for the winner
+        let matchupLoser = null;
+        // Matchup out of bracket bounds - over
         if (_B_Row_Elements.length - 1 < botIndex) {
-            let winnerRow = document.getElementById(ID_BE_ROW + topIndex);
-            let winnerElement = winnerRow.lastChild;
-            setNewWinner(winnerElement);
-        }
+            setNewWinner(topRow.lastChild, thisName);
+            matchupLoser = document.getElementById(ID_BE_ROW + (topIndex - matchupSize));
+        } // Check if top row is the winner
+        else if (topRow != null) {
+            if (topRow.childElementCount - 1 == thisSpacing + 1) {
+                setNewWinner(topRow.lastChild, thisName);
+                matchupLoser = document.getElementById(ID_BE_ROW + (topIndex - matchupSize));
+            }
+        } // Matchup out of bracket bounds - under
         else if (topIndex < 0) {
-            let winnerRow = document.getElementById(ID_BE_ROW + botIndex);
-            let winnerElement = winnerRow.lastChild;
-            setNewEntry(winnerElement);
+            setNewWinner(botRow.lastChild, thisName);
+            matchupLoser = document.getElementById(ID_BE_ROW + (botIndex + matchupSize));
+        } // Check if bottom row is the winner
+        else if (botRow != null) {
+            if (botRow.childElementCount - 1 == thisSpacing + 1) {
+                setNewWinner(botRow.lastChild, thisName);
+                matchupLoser = document.getElementById(ID_BE_ROW + (botIndex + matchupSize));
+            }
         }
         else {
-            // check which is the next round of bracket. top or bottom
-            let topRow = document.getElementById(ID_BE_ROW + topIndex);
-            let botRow = document.getElementById(ID_BE_ROW + botIndex);
-
-            let topSpacing = topRow.childElementCount - 1;
-            let botSpacing = botRow.childElementCount - 1;
-
-            if (topSpacing == thisSpacing + 1) {
-                setNewWinner(topRow.lastChild);
-            }
-            else if (botSpacing == thisSpacing + 1) {
-                setNewWinner(botRow.lastChild);
-            }
+            let msg = "issue advancing: " + winnerName;
+            console.log(msg);
+            alert(msg);
         }
+        
+        // Remove advance/revert arrows from the advanced entry and the matchup loser
+        hideArrowsFrom(thisBracketRow.lastChild);
+        if (matchupLoser != null) {
+            hideArrowsFrom(matchupLoser.lastChild);
+        }
+    }
 
-        // Finally, hide the revert/advance arrows
-        hideArrowsFrom(winnerElement);
+    revertRowEntry(bracketRowElement) {
+        console.log("asdf");
     }
 }
