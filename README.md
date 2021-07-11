@@ -1,15 +1,9 @@
-# Make a bracket for your tournament! :trophy:
+# 🏆 Tournament Bracket Maker 🏆
  
+[![image](https://user-images.githubusercontent.com/55027279/125179569-f8d4f180-e1b4-11eb-9fe9-04cdadccfeff.png)](https://xdwightsbeetsx.github.io/tournament-bracket/) 
 
 
-### Use in a browser [here :arrow_forward:](https://xdwightsbeetsx.github.io/tournament-bracket/) 
+### New Features (in the works) 🛠️
 
-
-<a href="https://xdwightsbeetsx.github.io/tournament-bracket/" target="_blank">![v1](https://github.com/XDwightsBeetsX/tournament-bracket/blob/master/img/progress/v1.png?raw=true)</a>
-
-
-### New Features Being added:
-
-- Exporting (.xlsx)
-- Custom Seeding
-- Revert Advance Entry
+- Exporting (.xlsx) 📈
+- Custom Seeding 🌾
