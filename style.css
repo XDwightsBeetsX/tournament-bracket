@@ -55,11 +55,6 @@
 #wrapper-footer {
     display: flex;
     flex-shrink: 0;
-
-    height: 80px;
-
-    line-height: 80px;
-    font-size: 12pt;
 }
 
 
@@ -200,10 +195,18 @@
 /*========= Footer ==========*/
 /*===========================*/
 #footer {
+    display: flex;
+    flex-direction: column;
     width: 100%;
-    text-align: center;
-
 }
-#footer > #git-link {
-    color: inherit;
+#link-wrapper {
+    width: fit-content;
+    margin: 0 auto;
+    padding: 5px;
+    cursor: pointer;
+}
+#git-logo {
+    height: 20px;
+    width: auto;
+    vertical-align: middle;
 }
