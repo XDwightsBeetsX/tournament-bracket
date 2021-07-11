@@ -1,9 +1,7 @@
 <!DOCTYPE html>
-<html lang="en" style="height: 100%;">
+<html lang="en" style="height: 100%">
     <head>
-        <title>
-            Tournament Bracket Maker
-        </title>
+        <title>Tournament Bracket Maker</title>
         
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -11,7 +9,17 @@
         
         <link href="style.css" rel="stylesheet"/>
         
-        <script src="brackets.js"></script>
+        <!-- 
+            order of imports matters.
+            lower files depend on upper ones.
+        -->
+        <script src="src/globals.js"></script>
+        <script src="src/utils.js"></script>
+        <script src="src/Entry.js"></script>
+        <script src="src/EntriesList.js"></script>
+        <script src="src/Bracket.js"></script>
+        <script src="src/controller.js"></script>
+        <script src="src/event_listeners.js"></script>
     </head>
 
     <!-- background and page padding -->
@@ -28,7 +36,7 @@
                     </div>
 
                     <div id="left-pane-content">
-                        <div id="entryList"></div>
+                        <div id="e-list"></div>
                     </div>
                 </div>
 
@@ -37,10 +45,10 @@
                         <div id="add-entry">
                             <div id="add-entry-prompt" class="verdana-gray">
                                 <span>New Entry:</span>
-                                <input id="entry-name" type="text">
+                                <input id="e-input" type="text">
                             </div>
                             <div id="add-entry-btn-wrapper">
-                                <div id="add-entry-btn" class="form-btn" onclick="addNewEntryToList()">
+                                <div id="add-entry-btn" class="form-btn" onclick="addEntry()">
                                     Add Entry
                                 </div>
                             </div>
@@ -62,7 +70,11 @@
 
         <div id="wrapper-footer" class="bg-light-gray rounded">
             <div id="footer" class="verdana-gray">
-                <a id="git-link" href="https://github.com/XDwightsBeetsX/tournament-bracket">Check out the GitHub repo</a>
+                <div id="link-wrapper">
+                    <div id="git-link" onclick="window.location='https://github.com/XDwightsBeetsX/tournament-bracket'">
+                        <img id="git-logo" src="img/git-logo.png">
+                    </div>
+                </div>
             </div>
         </div>
     </body>
